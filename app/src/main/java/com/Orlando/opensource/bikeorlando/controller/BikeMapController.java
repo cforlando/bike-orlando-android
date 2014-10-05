@@ -6,10 +6,12 @@ import android.support.annotation.RawRes;
 
 import com.Orlando.opensource.bikeorlando.R;
 import com.Orlando.opensource.bikeorlando.loader.FeatureCollectionLoader;
+import com.Orlando.opensource.bikeorlando.overlay.PolyLineTileProvider;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -44,14 +46,13 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
         bikeRackManager = new BikeRackManager(context, map);
         map.setOnCameraChangeListener(bikeRackManager);
         map.setOnMarkerClickListener(bikeRackManager);
+        map.addTileOverlay(new TileOverlayOptions().tileProvider(new PolyLineTileProvider()));
 
         FeatureCollectionLoader.getInstance(this, R.raw.bike_parking);
         FeatureCollectionLoader.getInstance(this, R.raw.bike_lanes);
     }
 
     public void destroy() {
-
-
         polylines.clear();
         bikeRackManager.clearItems();
         map = null;
