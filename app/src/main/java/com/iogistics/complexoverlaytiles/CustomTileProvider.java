@@ -32,6 +32,10 @@ import com.google.maps.android.projection.SphericalMercatorProjection;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
+/**
+ * @author Stewart Jackson
+ * @author Ian Thomas <toxicbakery@gmail.com>
+ */
 public class CustomTileProvider implements TileProvider {
 
     private static final int DEFAULT_TILE_SIZE = 256;
