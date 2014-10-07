@@ -12,29 +12,27 @@ import org.geojson.FeatureCollection;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Created by tencent on 9/19/2014.
- */
 public final class FeatureCollectionLoader {
 
-    static SparseArray<FeatureCollectionLoader> featureCollectionLoaders = new SparseArray<>();
+    private static final SparseArray<FeatureCollectionLoader> featureCollectionLoaders = new SparseArray<>();
 
-    final int resourceId;
+    private final int resourceId;
 
-    FeatureCollectionLoaderListener featureCollectionLoaderListener;
-    FeatureCollection featureCollection;
+    private FeatureCollectionLoaderListener featureCollectionLoaderListener;
+    private FeatureCollection featureCollection;
 
-    private FeatureCollectionLoader(FeatureCollectionLoaderListener listener, @RawRes int resourceId) {
+    private FeatureCollectionLoader(@RawRes int resourceId) {
         this.resourceId = resourceId;
     }
 
-    public synchronized static FeatureCollectionLoader getInstance(FeatureCollectionLoaderListener
-                                                                           featureCollectionLoaderListener,
-                                                                   @RawRes int resourceId) {
+    public synchronized static void getInstance(FeatureCollectionLoaderListener
+                                                        featureCollectionLoaderListener,
+                                                @RawRes int resourceId) {
+
         FeatureCollectionLoader loader = featureCollectionLoaders.get(resourceId);
 
         if (loader == null) {
-            loader = new FeatureCollectionLoader(featureCollectionLoaderListener, resourceId);
+            loader = new FeatureCollectionLoader(resourceId);
             loader.setFeatureCollectionLoaderListener(featureCollectionLoaderListener);
             featureCollectionLoaders.put(resourceId, loader);
 
@@ -45,8 +43,6 @@ public final class FeatureCollectionLoader {
             if (loader.featureCollection != null)
                 loader.setFeatureCollection(loader.featureCollection);
         }
-
-        return loader;
     }
 
     void setFeatureCollection(FeatureCollection featureCollection) {

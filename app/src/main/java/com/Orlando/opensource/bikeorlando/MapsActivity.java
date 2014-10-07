@@ -1,7 +1,7 @@
 package com.Orlando.opensource.bikeorlando;
 
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.Orlando.opensource.bikeorlando.controller.BikeMapController;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -9,6 +9,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+@SuppressWarnings("WeakerAccess")
 public class MapsActivity extends FragmentActivity {
 
     private static final double ORLANDO_LAT = 28.5383355;
