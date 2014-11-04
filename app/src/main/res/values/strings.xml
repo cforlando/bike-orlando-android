@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">Bike Orlando</string>
+    <string name="placeholder">Placeholder</string>
+    <string name="streetview_urlpath">file:///android_asset/streetview.html</string>
 
 </resources>
