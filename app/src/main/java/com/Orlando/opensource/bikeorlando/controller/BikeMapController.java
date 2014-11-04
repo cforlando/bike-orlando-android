@@ -12,15 +12,18 @@
 package com.Orlando.opensource.bikeorlando.controller;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.RawRes;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.Orlando.opensource.bikeorlando.MapsActivity;
 import com.Orlando.opensource.bikeorlando.R;
+import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
 import com.Orlando.opensource.bikeorlando.loader.FeatureCollectionLoader;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.clustering.ClusterManager;
 import com.iogistics.complexoverlaytiles.CustomTileProvider;
 
 import org.geojson.Feature;
@@ -29,7 +32,6 @@ import org.geojson.GeoJsonObject;
 import org.geojson.LineString;
 import org.geojson.LngLatAlt;
 import org.geojson.MultiLineString;
-import org.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +42,11 @@ import java.util.List;
  *
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
-public class BikeMapController implements FeatureCollectionLoader.FeatureCollectionLoaderListener {
+public class BikeMapController implements FeatureCollectionLoader.FeatureCollectionLoaderListener,
+        GoogleMap.OnMarkerClickListener {
 
     private final Context context;
-    private final BikeRackManager bikeRackManager;
+    private final BikeRackClusterManager bikeRackManager;
     private final GoogleMap map;
 
     private boolean tileProviderAdded;
@@ -52,7 +55,9 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
         this.map = map;
         this.context = context;
 
-        bikeRackManager = new BikeRackManager(context, map);
+        bikeRackManager = new BikeRackClusterManager(context, map);
+        bikeRackManager.getMarkerCollection().setOnMarkerClickListener(this);
+
         map.setOnCameraChangeListener(bikeRackManager);
         map.setOnMarkerClickListener(bikeRackManager);
 
@@ -92,8 +97,13 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
         return route;
     }
 
-    public void destroy() {
-        bikeRackManager.clearItems();
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Intent intent = new Intent(MapsActivity.ACTION_MARKER_SELECTED);
+        intent.putExtra(MapsActivity.EXTRA_LAT_LNG, marker.getPosition());
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+        return false;
     }
 
     @Override
@@ -108,8 +118,10 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
 
                 if (!tileProviderAdded) {
                     ArrayList<ArrayList<LatLng>> routes = featureCollectionToRoutes(featureCollection);
-                    map.addTileOverlay(new TileOverlayOptions().tileProvider(new CustomTileProvider(routes
-                    )));
+                    CustomTileProvider customTileProvider = new CustomTileProvider(routes);
+                    TileOverlayOptions tileOverlayOptions = new TileOverlayOptions().tileProvider(customTileProvider);
+
+                    map.addTileOverlay(tileOverlayOptions);
                     tileProviderAdded = true;
                 }
 
@@ -120,38 +132,16 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
         }
     }
 
-    void setBikeParking(FeatureCollection featureCollection) {
-        for (Feature feature : featureCollection.getFeatures()) {
-            Point point = (Point) feature.getGeometry();
-            LngLatAlt latLngAlt = point.getCoordinates();
-            LatLng latLng = new LatLng(latLngAlt.getLatitude(), latLngAlt.getLongitude());
+    public void destroy() {
+        bikeRackManager.clearItems();
+    }
 
-            bikeRackManager.addItem(new BikeRackItem(latLng));
+    private void setBikeParking(FeatureCollection featureCollection) {
+        for (Feature feature : featureCollection.getFeatures()) {
+            bikeRackManager.addItem(new BikeRackItem(feature));
         }
 
         bikeRackManager.cluster();
-    }
-
-    private static class BikeRackManager extends ClusterManager<BikeRackItem> {
-
-        public BikeRackManager(Context context, GoogleMap map) {
-            super(context, map);
-        }
-
-    }
-
-    private static class BikeRackItem implements ClusterItem {
-
-        private final LatLng latLng;
-
-        BikeRackItem(LatLng latLng) {
-            this.latLng = latLng;
-        }
-
-        @Override
-        public LatLng getPosition() {
-            return latLng;
-        }
     }
 
 }
