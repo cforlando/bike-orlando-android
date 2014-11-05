@@ -13,24 +13,17 @@
 
 package com.iogistics.complexoverlaytiles;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Paint.Cap;
-import android.graphics.Paint.Join;
-import android.graphics.Path;
+import android.content.*;
+import android.graphics.*;
+import android.graphics.Paint.*;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Tile;
-import com.google.android.gms.maps.model.TileProvider;
+import com.Orlando.opensource.bikeorlando.*;
+import com.google.android.gms.maps.model.*;
 import com.google.maps.android.geometry.Point;
-import com.google.maps.android.projection.SphericalMercatorProjection;
+import com.google.maps.android.projection.*;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Stewart Jackson
@@ -46,7 +39,7 @@ public class CustomTileProvider implements TileProvider {
     private final ArrayList<ArrayList<LatLng>> routes;
     private final Paint paint;
 
-    public CustomTileProvider(ArrayList<ArrayList<LatLng>> routes) {
+    public CustomTileProvider(Context context, ArrayList<ArrayList<LatLng>> routes) {
         scale = 1;
         dimension = scale * DEFAULT_TILE_SIZE;
 
@@ -55,7 +48,7 @@ public class CustomTileProvider implements TileProvider {
 
         paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.RED);
+        paint.setColor(context.getResources().getColor(R.color.colorRoute));
         paint.setStrokeCap(Cap.ROUND);
         paint.setStrokeJoin(Join.ROUND);
         paint.setShadowLayer(0, 0, 0, 0);

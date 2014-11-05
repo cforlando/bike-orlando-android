@@ -7,5 +7,16 @@
     <color name="colorAccent">#ff6d00</color>
     <color name="colorTextPrimary">#ffffffff</color>
     <color name="colorTextPrimaryInverse">#ff000000</color>
+    <!-- MAP -->
+    <color name="colorRoute">#ff4A148C</color>
+    <array name="colorClusters">
+        <item>#689F38</item>
+        <item>#7CB342</item>
+        <item>#8BC34A</item>
+        <item>#9CCC65</item>
+        <item>#AED581</item>
+        <item>#C5E1A5</item>
+        <item>#DCEDC8</item>
+    </array>
 
 </resources>

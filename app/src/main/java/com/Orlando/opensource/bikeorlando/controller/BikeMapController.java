@@ -118,7 +118,7 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
 
                 if (!tileProviderAdded) {
                     ArrayList<ArrayList<LatLng>> routes = featureCollectionToRoutes(featureCollection);
-                    CustomTileProvider customTileProvider = new CustomTileProvider(routes);
+                    CustomTileProvider customTileProvider = new CustomTileProvider(context, routes);
                     TileOverlayOptions tileOverlayOptions = new TileOverlayOptions().tileProvider(customTileProvider);
 
                     map.addTileOverlay(tileOverlayOptions);
