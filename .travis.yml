@@ -1,0 +1,14 @@
+language: android
+jdk: oraclejdk7
+before_install:
+ - chmod +x gradlew
+
+env:
+  matrix:
+    - ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
+
+android:
+  components:
+    - build-tools-21.0.2
+
+script: ./gradlew assembleDebug
