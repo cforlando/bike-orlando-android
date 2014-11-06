@@ -1,5 +1,8 @@
 language: android
 jdk: oraclejdk7
+before_install:
+ - chmod +x gradlew
+
 env:
   matrix:
     - ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
