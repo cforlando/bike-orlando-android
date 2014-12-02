@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+
+<head>
+</head>
+
+<body onload="doLoad()">
+
+<p>Convert Orlando bike parking JSON data to usable key value pairs in the properties.</p>
+
+<textarea id="input" rows="10" cols="100"></textarea>
+
+<p><button id="convert">Convert</button></p>
+
+<textarea id="output" rows="10" cols="100"></textarea>
+
+
+<script type="text/javascript">
+
+var buttonConvert;
+var dataInput
+var dataOutput;
+
+function doLoad() {
+
+	buttonConvert = document.getElementById('convert');
+	dataInput = document.getElementById('input');
+	dataOutput = document.getElementById('output');
+
+	buttonConvert.addEventListener("click", doConvert);
+
+}
+
+function doConvert() {
+
+	try {
+		var result = JSON.parse(dataInput.value);
+		parseDescriptions(result);
+		dataOutput.value = JSON.stringify(result);
+	} catch (err) {
+		dataOutput.value = err;
+	}
+
+}
+
+function parseDescriptions(data) {
+	var features = data.features;
+	var desiredKeys = ["address", "capacity", "ownership", "type"];
+
+	// Find key/value pairs in the description text "Adress = 123 Main St" will group "Address" and "123 Main St"
+	var regex = /(\w+) = ([\w\s -\.]+)\n/g;
+
+	features.map(function(item) {
+
+		var description = item.properties.description;
+		var match;
+		while ((match = regex.exec(description)) != null) {
+			var key = match[1].toLowerCase();
+			var value = match[2];
+
+			if (desiredKeys.indexOf(key) > -1)
+				item.properties[key] = value;
+		}
+
+		// Delete useless keys
+		delete item.properties.styleHash;
+		delete item.properties.styleUrl;
+		delete item.properties.description;
+	});
+}
+
+</script>
+
+</body>
+
+</html>

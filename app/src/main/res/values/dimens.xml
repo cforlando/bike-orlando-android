@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="rack_padding">7dp</dimen>
-    <dimen name="rack_street_view">240dp</dimen>
 </resources>

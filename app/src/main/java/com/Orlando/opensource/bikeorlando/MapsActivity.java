@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.Orlando.opensource.bikeorlando.controller.BikeMapController;
+import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
 import com.Orlando.opensource.bikeorlando.fragment.FragmentRack;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,26 +32,31 @@ import com.google.android.gms.maps.model.LatLng;
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
 @SuppressWarnings("WeakerAccess")
-public class MapsActivity extends Activity {
+public class MapsActivity extends Activity implements GoogleMap.OnMapClickListener {
 
     public static final String ACTION_MARKER_SELECTED = MapsActivity.class.getName() + ".ACTION_MARKER_SELECTED";
-    public static final String EXTRA_LAT_LNG = "EXTRA_LAT_LNG";
+    public static final String EXTRA_BIKE_RACK_ITEM = "EXTRA_BIKE_RACK_ITEM";
+
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ACTION_MARKER_SELECTED.equals(intent.getAction())) {
-                final LatLng latLng = intent.getParcelableExtra(EXTRA_LAT_LNG);
+                final BikeRackItem bikeRackItem = intent.getParcelableExtra(EXTRA_BIKE_RACK_ITEM);
 
-                Fragment fragment = FragmentRack.newInstance(latLng);
-
-                getFragmentManager().beginTransaction()
-                        .setCustomAnimations(R.anim.slide_up, R.anim.slide_down, R.anim.slide_up, R.anim.slide_down)
-                        .replace(R.id.panel, fragment)
-                        .commit();
-
+                Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
+                if (fragment == null || fragment.isHidden()) {
+                    fragment = FragmentRack.newInstance(bikeRackItem);
+                    getFragmentManager().beginTransaction()
+                            .setCustomAnimations(R.anim.slide_up, 0)
+                            .replace(R.id.panel, fragment, FragmentRack.TAG)
+                            .commit();
+                } else {
+                    ((FragmentRack) fragment).setBikeRackItem(bikeRackItem);
+                }
             }
         }
     };
+
     private static final double ORLANDO_LAT = 28.5383355;
     private static final double ORLANDO_LNG = -81.3792365;
     private static final int ZOOM_CITY = 11;
@@ -67,19 +73,19 @@ public class MapsActivity extends Activity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putBoolean(KEY_FIRST_RUN, false);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded(null);
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver,
                 new IntentFilter(ACTION_MARKER_SELECTED));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(KEY_FIRST_RUN, false);
     }
 
     @Override
@@ -93,7 +99,23 @@ public class MapsActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
+        if (map != null)
+            map.setOnMapClickListener(null);
+
         mapController.destroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
+        if (fragment != null && !fragment.isHidden()) {
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(0, R.anim.slide_down)
+                    .hide(fragment)
+                    .commit();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void setUpMapIfNeeded(Bundle savedInstanceState) {
@@ -115,6 +137,20 @@ public class MapsActivity extends Activity {
                 map.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_CITY));
             }
         }
+
+        if (map != null) {
+            map.setOnMapClickListener(this);
+        }
     }
 
+    @Override
+    public void onMapClick(final LatLng latLng) {
+        Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
+        if (fragment != null) {
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(0, R.anim.slide_down)
+                    .hide(fragment)
+                    .commit();
+        }
+    }
 }

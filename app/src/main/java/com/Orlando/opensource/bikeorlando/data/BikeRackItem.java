@@ -1,5 +1,8 @@
 package com.Orlando.opensource.bikeorlando.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -7,15 +10,69 @@ import org.geojson.Feature;
 import org.geojson.LngLatAlt;
 import org.geojson.Point;
 
-public final class BikeRackItem implements ClusterItem {
+public final class BikeRackItem implements ClusterItem, Parcelable {
 
-    private final LatLng latLng;
+    public static final Creator<BikeRackItem> CREATOR = new Creator<BikeRackItem>() {
+        @Override
+        public BikeRackItem createFromParcel(final Parcel source) {
+            return new BikeRackItem(source);
+        }
+
+        @Override
+        public BikeRackItem[] newArray(final int size) {
+            return new BikeRackItem[0];
+        }
+    };
+
+    private static final String PROP_ADDRESS = "address";
+    private static final String PROP_CAPACITY = "capacity";
+    private static final String PROP_OWNERSHIP = "ownership";
+    private static final String PROP_TYPE = "type";
+
+    private final LatLng position;
+    private final String address;
+    private final String ownership;
+    private final String type;
+    private final int capacity;
 
     public BikeRackItem(Feature feature) {
-        Point point = (Point) feature.getGeometry();
-        LngLatAlt latLngAlt = point.getCoordinates();
+        final Point point = (Point) feature.getGeometry();
+        final LngLatAlt latLngAlt = point.getCoordinates();
 
-        this.latLng = new LatLng(latLngAlt.getLatitude(), latLngAlt.getLongitude());
+        final String address = feature.getProperty(PROP_ADDRESS);
+        final String ownership = feature.getProperty(PROP_OWNERSHIP);
+        final String type = feature.getProperty(PROP_TYPE);
+        final String capacity = feature.getProperty(PROP_CAPACITY);
+
+        position = new LatLng(latLngAlt.getLatitude(), latLngAlt.getLongitude());
+        this.address = address == null ? latLngAlt.toString() : address;
+        this.ownership = ownership == null ? "" : ownership.trim();
+        this.type = type == null ? "n/a" : type.trim();
+        this.capacity = capacity == null ? 0 : Integer.parseInt(capacity);
+        System.out.println(capacity + " : " + this.capacity);
+    }
+
+    private BikeRackItem(Parcel parcel) {
+        position = new LatLng(parcel.readDouble(), parcel.readDouble());
+        address = parcel.readString();
+        ownership = parcel.readString();
+        type = parcel.readString();
+        capacity = parcel.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel parcel, final int flags) {
+        parcel.writeDouble(position.latitude);
+        parcel.writeDouble(position.longitude);
+        parcel.writeString(address);
+        parcel.writeString(ownership);
+        parcel.writeString(type);
+        parcel.writeInt(capacity);
     }
 
     /**
@@ -23,16 +80,32 @@ public final class BikeRackItem implements ClusterItem {
      * as the object being immutable is a dependency of {@link com.Orlando.opensource.bikeorlando.controller
      * .BikeRackClusterManager}.
      *
-     * @return
+     * @return World Geodetic coordinate of the bike rack
      */
     @Override
     public LatLng getPosition() {
-        return latLng;
+        return position;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getOwnership() {
+        return ownership;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     @Override
     public String toString() {
-        return latLng.toString();
+        return position.toString();
     }
 
 }
