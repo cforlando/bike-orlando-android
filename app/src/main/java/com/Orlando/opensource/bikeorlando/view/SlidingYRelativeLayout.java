@@ -8,6 +8,7 @@ import android.widget.RelativeLayout;
 /**
  * {@link android.widget.RelativeLayout} implementation that allows for animating slide in on the Y axis.
  */
+@SuppressWarnings("unused")
 public class SlidingYRelativeLayout extends RelativeLayout {
 
     private float yFraction = 0;
@@ -48,8 +49,7 @@ public class SlidingYRelativeLayout extends RelativeLayout {
             return;
         }
 
-        float translationY = getHeight() * fraction;
-        setTranslationY(translationY);
+        setTranslationY(getHeight() * fraction);
     }
 
 }

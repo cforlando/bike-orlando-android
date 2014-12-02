@@ -4,5 +4,9 @@
     <string name="app_name">Bike Orlando</string>
     <string name="placeholder">Placeholder</string>
     <string name="streetview_urlpath">file:///android_asset/streetview.html</string>
+    <!-- RACK -->
+    <string name="rack_ownership">Owned by ?</string>
+    <string name="rack_type">Type: ?</string>
+    <string name="rack_capacity">Capacity: ?</string>
 
 </resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       tools:showIn="@layout/fragment_rack">
+
+    <View
+        android:id="@+id/center"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/rack_text_view_address"
+        style="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorAccent"
+        android:ellipsize="end"
+        android:gravity="center_vertical|start"
+        android:lines="1"
+        android:padding="@dimen/rack_padding"
+        android:singleLine="true"
+        android:text="@string/placeholder"/>
+
+    <TextView
+        android:id="@+id/rack_text_view_ownership"
+        style="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rack_text_view_address"
+        android:padding="@dimen/rack_padding"
+        android:text="@string/rack_type"/>
+
+    <TextView
+        android:id="@+id/rack_text_view_type"
+        style="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/center"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/center"
+        android:layout_below="@+id/rack_text_view_ownership"
+        android:ellipsize="end"
+        android:lines="1"
+        android:padding="@dimen/rack_padding"
+        android:text="@string/rack_ownership"/>
+
+    <TextView
+        android:id="@+id/rack_text_view_capacity"
+        style="@style/TextAppearance.AppCompat.Large.Inverse"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/center"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignStart="@+id/center"
+        android:layout_below="@+id/rack_text_view_ownership"
+        android:lines="1"
+        android:padding="@dimen/rack_padding"
+        android:text="@string/rack_capacity"/>
+
+</merge>

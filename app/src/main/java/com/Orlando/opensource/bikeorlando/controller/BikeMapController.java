@@ -99,8 +99,10 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        BikeRackItem bikeRackItem = bikeRackManager.getBikeRackItem(marker);
+
         Intent intent = new Intent(MapsActivity.ACTION_MARKER_SELECTED);
-        intent.putExtra(MapsActivity.EXTRA_LAT_LNG, marker.getPosition());
+        intent.putExtra(MapsActivity.EXTRA_BIKE_RACK_ITEM, bikeRackItem);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
         return false;

@@ -15,12 +15,16 @@ import com.google.maps.android.clustering.*;
 import com.google.maps.android.clustering.view.*;
 import com.google.maps.android.ui.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 final class BikeRackClusterRenderer extends DefaultClusterRenderer<BikeRackItem> {
 
     private static final int[] BUCKETS = {10, 20, 50, 100, 200, 500, 1000};
 
     private final int[] clusterColors;
-    private final SparseArray<BitmapDescriptor> clusterBitmapDescriptors = new SparseArray<BitmapDescriptor>();
+    private final SparseArray<BitmapDescriptor> clusterBitmapDescriptors = new SparseArray<>();
+    private final Map<String, BikeRackItem> markerToBikeRackItemMap = new HashMap<>();
 
     private final BitmapDescriptor markerBitmapDescriptor;
     private final IconGenerator iconGenerator;
@@ -64,6 +68,15 @@ final class BikeRackClusterRenderer extends DefaultClusterRenderer<BikeRackItem>
         }
 
         markerOptions.icon(descriptor);
+    }
+
+    @Override
+    protected void onClusterItemRendered(final BikeRackItem clusterItem, final Marker marker) {
+        markerToBikeRackItemMap.put(marker.getId(), clusterItem);
+    }
+
+    public BikeRackItem getItemForMarker(Marker marker) {
+        return markerToBikeRackItemMap.get(marker.getId());
     }
 
     private LayerDrawable makeClusterBackground() {

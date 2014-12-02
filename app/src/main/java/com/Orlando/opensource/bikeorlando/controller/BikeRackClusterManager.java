@@ -4,16 +4,23 @@ import android.content.Context;
 
 import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.*;
 
 public class BikeRackClusterManager extends ClusterManager<BikeRackItem> {
 
+    private final BikeRackClusterRenderer bikeRackClusterRenderer;
+
     public BikeRackClusterManager(Context context, GoogleMap map) {
         super(context, map);
 
-        BikeRackClusterRenderer bikeRackClusterRenderer = new BikeRackClusterRenderer(context, map, this);
+        bikeRackClusterRenderer = new BikeRackClusterRenderer(context, map, this);
         setRenderer(bikeRackClusterRenderer);
 
+    }
+
+    BikeRackItem getBikeRackItem(Marker marker) {
+        return bikeRackClusterRenderer.getClusterItem(marker);
     }
 
 }
