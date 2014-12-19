@@ -132,7 +132,8 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
                 // Look at Orlando from state level
                 LatLng orlandoLatLng = new LatLng(ORLANDO_LAT, ORLANDO_LNG);
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(orlandoLatLng, ZOOM_STATE));
-
+                map.setMyLocationEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(true);
                 // Animate zoom to city level
                 map.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_CITY));
             }
