@@ -1,4 +1,4 @@
-<com.Orlando.opensource.bikeorlando.view.SlidingYRelativeLayout
+<com.codefororlando.transport.view.SlidingYRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,5 +19,5 @@
         android:layout_alignParentBottom="true"
         android:clickable="true"/>
 
-</com.Orlando.opensource.bikeorlando.view.SlidingYRelativeLayout>
+</com.codefororlando.transport.view.SlidingYRelativeLayout>
 

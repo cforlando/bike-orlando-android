@@ -17,7 +17,7 @@ import android.content.*;
 import android.graphics.*;
 import android.graphics.Paint.*;
 
-import com.Orlando.opensource.bikeorlando.*;
+import com.codefororlando.transport.bikeorlando.*;
 import com.google.android.gms.maps.model.*;
 import com.google.maps.android.geometry.Point;
 import com.google.maps.android.projection.*;

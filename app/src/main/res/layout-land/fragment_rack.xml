@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.Orlando.opensource.bikeorlando.view.SlidingYRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.codefororlando.transport.view.SlidingYRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                                 android:layout_width="wrap_content"
                                                                 android:layout_height="match_parent"
                                                                 android:background="@color/background_material_light">
 
     <include layout="@layout/rack_content"/>
 
-</com.Orlando.opensource.bikeorlando.view.SlidingYRelativeLayout>
+</com.codefororlando.transport.view.SlidingYRelativeLayout>
