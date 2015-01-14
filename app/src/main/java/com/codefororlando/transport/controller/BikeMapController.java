@@ -9,17 +9,17 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.Orlando.opensource.bikeorlando.controller;
+package com.codefororlando.transport.controller;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.RawRes;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.Orlando.opensource.bikeorlando.MapsActivity;
-import com.Orlando.opensource.bikeorlando.R;
-import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
-import com.Orlando.opensource.bikeorlando.loader.FeatureCollectionLoader;
+import com.codefororlando.transport.MapsActivity;
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.loader.FeatureCollectionLoader;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;

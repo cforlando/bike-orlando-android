@@ -1,4 +1,4 @@
-package com.Orlando.opensource.bikeorlando.data;
+package com.codefororlando.transport.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -77,7 +77,7 @@ public final class BikeRackItem implements ClusterItem, Parcelable {
 
     /**
      * Returns the underlying LatLng position. It is imperative that the LatLng be cloned should changes need to be made
-     * as the object being immutable is a dependency of {@link com.Orlando.opensource.bikeorlando.controller
+     * as the object being immutable is a dependency of {@link com.codefororlando.transport.controller
      * .BikeRackClusterManager}.
      *
      * @return World Geodetic coordinate of the bike rack

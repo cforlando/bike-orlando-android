@@ -1,4 +1,4 @@
-package com.Orlando.opensource.bikeorlando.fragment;
+package com.codefororlando.transport.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -8,9 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.Orlando.opensource.bikeorlando.MapsActivity;
-import com.Orlando.opensource.bikeorlando.R;
-import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
+import com.codefororlando.transport.MapsActivity;
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.data.BikeRackItem;
 
 public class FragmentRack extends Fragment implements View.OnClickListener {
 

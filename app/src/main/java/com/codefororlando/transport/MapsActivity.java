@@ -9,7 +9,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.Orlando.opensource.bikeorlando;
+package com.codefororlando.transport;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -20,9 +20,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.Orlando.opensource.bikeorlando.controller.BikeMapController;
-import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
-import com.Orlando.opensource.bikeorlando.fragment.FragmentRack;
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.controller.BikeMapController;
+import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.fragment.FragmentRack;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
