@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cforlando/BikeOrlando.svg?branch=master)](https://travis-ci.org/cforlando/BikeOrlando)
+[![Build Status](https://travis-ci.org/cforlando/bike-orlando-android.svg?branch=master)](https://travis-ci.org/cforlando/bike-orlando-android)
 
 BikeOrlando
 ===========
