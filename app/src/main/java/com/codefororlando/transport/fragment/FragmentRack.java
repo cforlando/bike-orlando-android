@@ -1,14 +1,19 @@
 package com.codefororlando.transport.fragment;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.codefororlando.transport.MapsActivity;
+import com.codefororlando.transport.animation.EmptyAnimationListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.data.BikeRackItem;
 
@@ -33,12 +38,33 @@ public class FragmentRack extends Fragment implements View.OnClickListener {
         return fragment;
     }
 
+    public void removeFragment() {
+        final View view = getView();
+        if (view == null) {
+            return;
+        }
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        final Animation animation = new TranslateAnimation(0, 0, 0, view.getHeight());
+        animation.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+        animation.setAnimationListener(new EmptyAnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                try {
+                    fragmentManager.beginTransaction()
+                            .remove(FragmentRack.this)
+                            .commitAllowingStateLoss();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        view.startAnimation(animation);
+    }
+
     @Override
     public void onClick(final View v) {
-        getFragmentManager().beginTransaction()
-                .setCustomAnimations(0, R.anim.slide_down)
-                .hide(this)
-                .commit();
+        removeFragment();
     }
 
     @Nullable
