@@ -1,4 +1,4 @@
-package com.Orlando.opensource.bikeorlando.controller;
+package com.codefororlando.transport.controller;
 
 import android.content.*;
 import android.content.res.*;
@@ -7,8 +7,8 @@ import android.graphics.drawable.shapes.*;
 import android.util.*;
 import android.view.*;
 
-import com.Orlando.opensource.bikeorlando.*;
-import com.Orlando.opensource.bikeorlando.data.*;
+import com.codefororlando.transport.bikeorlando.*;
+import com.codefororlando.transport.data.*;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import com.google.maps.android.clustering.*;

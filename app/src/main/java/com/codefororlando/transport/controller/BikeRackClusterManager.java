@@ -1,8 +1,8 @@
-package com.Orlando.opensource.bikeorlando.controller;
+package com.codefororlando.transport.controller;
 
 import android.content.Context;
 
-import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
+import com.codefororlando.transport.data.BikeRackItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.*;

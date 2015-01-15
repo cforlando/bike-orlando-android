@@ -9,7 +9,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.Orlando.opensource.bikeorlando;
+package com.codefororlando.transport;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -18,11 +18,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.Orlando.opensource.bikeorlando.controller.BikeMapController;
-import com.Orlando.opensource.bikeorlando.data.BikeRackItem;
-import com.Orlando.opensource.bikeorlando.fragment.FragmentRack;
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.controller.BikeMapController;
+import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.fragment.FragmentRack;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -82,7 +84,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean(KEY_FIRST_RUN, false);
@@ -109,10 +111,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
     public void onBackPressed() {
         Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
         if (fragment != null && !fragment.isHidden()) {
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(0, R.anim.slide_down)
-                    .hide(fragment)
-                    .commit();
+            removeRackFragment();
         } else {
             super.onBackPressed();
         }
@@ -132,7 +131,8 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
                 // Look at Orlando from state level
                 LatLng orlandoLatLng = new LatLng(ORLANDO_LAT, ORLANDO_LNG);
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(orlandoLatLng, ZOOM_STATE));
-
+                map.setMyLocationEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(true);
                 // Animate zoom to city level
                 map.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_CITY));
             }
@@ -145,12 +145,14 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void onMapClick(final LatLng latLng) {
-        Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
-        if (fragment != null) {
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(0, R.anim.slide_down)
-                    .hide(fragment)
-                    .commit();
+        removeRackFragment();
+    }
+
+    private void removeRackFragment() {
+        FragmentRack fragmentRack = (FragmentRack) getFragmentManager().findFragmentByTag(FragmentRack.TAG);
+        if (fragmentRack != null) {
+            fragmentRack.removeFragment();
         }
     }
+
 }

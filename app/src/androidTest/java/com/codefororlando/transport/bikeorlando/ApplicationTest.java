@@ -1,4 +1,4 @@
-package com.Orlando.opensource.bikeorlando;
+package com.codefororlando.transport.bikeorlando;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
