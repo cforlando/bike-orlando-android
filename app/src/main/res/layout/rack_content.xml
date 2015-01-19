@@ -4,62 +4,74 @@
        xmlns:tools="http://schemas.android.com/tools"
        tools:showIn="@layout/fragment_rack">
 
-    <View
-        android:id="@+id/center"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true"/>
-
-    <TextView
-        android:id="@+id/rack_text_view_address"
-        style="@style/TextAppearance.AppCompat.Headline"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/colorAccent"
-        android:ellipsize="end"
-        android:gravity="center_vertical|start"
-        android:lines="1"
-        android:padding="@dimen/rack_padding"
-        android:singleLine="true"
-        android:text="@string/placeholder"/>
+        android:layout_marginTop="@dimen/fab_size_half"
+        android:background="?android:colorBackground">
 
-    <TextView
-        android:id="@+id/rack_text_view_ownership"
-        style="@style/TextAppearance.AppCompat.Large.Inverse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rack_text_view_address"
-        android:padding="@dimen/rack_padding"
-        android:text="@string/rack_type"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?colorPrimaryDark"/>
 
-    <TextView
-        android:id="@+id/rack_text_view_type"
-        style="@style/TextAppearance.AppCompat.Large.Inverse"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/center"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/center"
-        android:layout_below="@+id/rack_text_view_ownership"
-        android:ellipsize="end"
-        android:lines="1"
-        android:padding="@dimen/rack_padding"
-        android:text="@string/rack_ownership"/>
+        <TextView
+            android:id="@+id/rack_text_view_address"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:ellipsize="end"
+            android:gravity="center_vertical|start"
+            android:lines="1"
+            android:padding="@dimen/rack_padding"
+            android:singleLine="true"
+            android:text="@string/placeholder"/>
 
-    <TextView
-        android:id="@+id/rack_text_view_capacity"
-        style="@style/TextAppearance.AppCompat.Large.Inverse"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/center"
+        <TextView
+            android:id="@+id/rack_text_view_ownership"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rack_text_view_address"
+            android:padding="@dimen/rack_padding"
+            android:text="@string/rack_type"/>
+
+        <TextView
+            android:id="@+id/rack_text_view_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            android:padding="@dimen/rack_padding"
+            android:text="@string/rack_ownership"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/rack_text_view_capacity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/rack_text_view_address"
+            android:lines="1"
+            android:padding="@dimen/rack_padding"
+            android:text="@string/rack_capacity"/>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/fab_route_to_point"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignStart="@+id/center"
-        android:layout_below="@+id/rack_text_view_ownership"
-        android:lines="1"
-        android:padding="@dimen/rack_padding"
-        android:text="@string/rack_capacity"/>
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:background="@drawable/fab_button"
+        android:contentDescription="@string/fab_route_to_point"
+        android:elevation="@dimen/elevation_high"
+        android:src="@android:drawable/ic_input_add"
+        android:tint="@android:color/white"
+        tools:ignore="UnusedAttribute"/>
 
 </merge>

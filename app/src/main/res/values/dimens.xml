@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="rack_padding">7dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_size">64dp</dimen>
+    <dimen name="fab_size_half">32dp</dimen>
+    <dimen name="fab_border_upper">1dp</dimen>
+    <dimen name="fab_border_lower">2dp</dimen>
+    <dimen name="elevation_low">1dp</dimen>
+    <dimen name="elevation_high">4dp</dimen>
 </resources>
