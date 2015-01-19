@@ -20,6 +20,7 @@ import com.codefororlando.transport.MapsActivity;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.data.BikeRackItem;
 import com.codefororlando.transport.loader.FeatureCollectionLoader;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -37,8 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Map manager handling async loading callbacks and interpretation as well as general instantiation and handling of the
- * map features.
+ * Map manager handling async loading callbacks and interpretation as well as general instantiation
+ * and handling of the map features.
  *
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
@@ -105,7 +106,11 @@ public class BikeMapController implements FeatureCollectionLoader.FeatureCollect
         intent.putExtra(MapsActivity.EXTRA_BIKE_RACK_ITEM, bikeRackItem);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
-        return false;
+        // Animate to the location manually as true is returned by the click to prevent the info window popup
+        map.animateCamera(CameraUpdateFactory.newLatLng(bikeRackItem.getPosition()));
+
+        // Return true to disable the info window popup. This inadvertently also disables animation to the position
+        return true;
     }
 
     @Override

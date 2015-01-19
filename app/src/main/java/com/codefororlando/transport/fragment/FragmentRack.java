@@ -1,12 +1,16 @@
 package com.codefororlando.transport.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codefororlando.transport.MapsActivity;
 import com.codefororlando.transport.bikeorlando.R;
@@ -35,10 +39,19 @@ public class FragmentRack extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(final View v) {
-        getFragmentManager().beginTransaction()
-                .setCustomAnimations(0, R.anim.slide_down)
-                .hide(this)
-                .commit();
+        switch (v.getId()) {
+            case R.id.fab_route_to_point:
+                final Uri geoLocation = Uri.parse("geo:0,0?q=" + bikeRackItem.getAddress());
+                final Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(geoLocation);
+                if (intent.resolveActivity(getActivity().getPackageManager()) == null) {
+                    Toast.makeText(getActivity(), R.string.error_no_mapping_app, Toast.LENGTH_LONG)
+                            .show();
+                } else {
+                    startActivity(intent);
+                }
+                break;
+        }
     }
 
     @Nullable
@@ -54,6 +67,17 @@ public class FragmentRack extends Fragment implements View.OnClickListener {
         textViewRackCapacity = (TextView) view.findViewById(R.id.rack_text_view_capacity);
 
         setBikeRackItem(getArguments().<BikeRackItem>getParcelable(MapsActivity.EXTRA_BIKE_RACK_ITEM));
+
+        final View fabRouteToPoint = view.findViewById(R.id.fab_route_to_point);
+        fabRouteToPoint.setScaleY(0);
+        fabRouteToPoint.setScaleX(0);
+        fabRouteToPoint.setOnClickListener(this);
+        fabRouteToPoint.animate()
+                .scaleY(1)
+                .scaleX(1)
+                .setDuration(400)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .start();
 
         return view;
     }
