@@ -18,5 +18,7 @@
         <item>#C5E1A5</item>
         <item>#DCEDC8</item>
     </array>
+    <!-- FAB -->
+    <color name="fab_border">#77424242</color>
 
 </resources>
