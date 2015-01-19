@@ -59,10 +59,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         }
     };
 
-    private static final double ORLANDO_LAT = 28.5383355;
-    private static final double ORLANDO_LNG = -81.3792365;
     private static final int ZOOM_CITY = 11;
-    private static final int ZOOM_STATE = 7;
     private static final String KEY_FIRST_RUN = "KEY_FIRST_RUN";
     private BikeMapController mapController;
     private GoogleMap map;
@@ -129,8 +126,6 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
 
             if (savedInstanceState == null) {
                 // Look at Orlando from state level
-                LatLng orlandoLatLng = new LatLng(ORLANDO_LAT, ORLANDO_LNG);
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(orlandoLatLng, ZOOM_STATE));
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
                 // Animate zoom to city level
