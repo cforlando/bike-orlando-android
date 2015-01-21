@@ -13,18 +13,25 @@ package com.codefororlando.transport;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 
+import com.codefororlando.transport.animation.EmptyAnimationListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.controller.BikeMapController;
 import com.codefororlando.transport.data.BikeRackItem;
 import com.codefororlando.transport.fragment.FragmentRack;
+import com.codefororlando.transport.fragment.ISelectableItemFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -36,29 +43,35 @@ import com.google.android.gms.maps.model.LatLng;
 @SuppressWarnings("WeakerAccess")
 public class MapsActivity extends Activity implements GoogleMap.OnMapClickListener {
 
-    public static final String ACTION_MARKER_SELECTED = MapsActivity.class.getName() + ".ACTION_MARKER_SELECTED";
+    /**
+     * Bike item marker selected.
+     * <p/>
+     * Always includes {@link #EXTRA_BIKE_RACK_ITEM}.
+     */
+    public static final String ACTION_BIKE_MARKER_SELECTED = "ACTION_BIKE_MARKER_SELECTED";
+
+    /**
+     * {@link com.codefororlando.transport.data.BikeRackItem} instance.
+     */
     public static final String EXTRA_BIKE_RACK_ITEM = "EXTRA_BIKE_RACK_ITEM";
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (ACTION_MARKER_SELECTED.equals(intent.getAction())) {
-                final BikeRackItem bikeRackItem = intent.getParcelableExtra(EXTRA_BIKE_RACK_ITEM);
-
-                Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
-                if (fragment == null || fragment.isHidden()) {
-                    fragment = FragmentRack.newInstance(bikeRackItem);
-                    getFragmentManager().beginTransaction()
-                            .setCustomAnimations(R.anim.slide_up, 0)
-                            .replace(R.id.panel, fragment, FragmentRack.TAG)
-                            .commit();
-                } else {
-                    ((FragmentRack) fragment).setBikeRackItem(bikeRackItem);
+            switch (intent.getAction()) {
+                case ACTION_BIKE_MARKER_SELECTED: {
+                    final BikeRackItem bikeRackItem = intent.getParcelableExtra(EXTRA_BIKE_RACK_ITEM);
+                    Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+                    if (fragment == null) {
+                        fragment = FragmentRack.newInstance(bikeRackItem);
+                        showSelectableItemFragment(fragment);
+                    } else {
+                        ((FragmentRack) fragment).setBikeRackItem(bikeRackItem);
+                    }
                 }
             }
         }
     };
-
     private static final int ZOOM_CITY = 11;
     private static final String KEY_FIRST_RUN = "KEY_FIRST_RUN";
     private BikeMapController mapController;
@@ -77,7 +90,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         setUpMapIfNeeded(null);
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver,
-                new IntentFilter(ACTION_MARKER_SELECTED));
+                new IntentFilter(ACTION_BIKE_MARKER_SELECTED));
     }
 
     @Override
@@ -108,7 +121,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
     public void onBackPressed() {
         Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
         if (fragment != null && !fragment.isHidden()) {
-            removeRackFragment();
+            removeSelectableItemFragment();
         } else {
             super.onBackPressed();
         }
@@ -140,13 +153,57 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void onMapClick(final LatLng latLng) {
-        removeRackFragment();
+        removeSelectableItemFragment();
     }
 
-    private void removeRackFragment() {
-        FragmentRack fragmentRack = (FragmentRack) getFragmentManager().findFragmentByTag(FragmentRack.TAG);
-        if (fragmentRack != null) {
-            fragmentRack.removeFragment();
+    private void removeSelectableItemFragment() {
+        final Fragment selectableItemFragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+        if (selectableItemFragment != null) {
+            final View view = selectableItemFragment.getView();
+            if (view == null) {
+                return;
+            }
+
+            final FragmentManager fragmentManager = getFragmentManager();
+            final Animation animation = new TranslateAnimation(0, 0, 0, view.getHeight());
+            animation.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+            animation.setAnimationListener(new EmptyAnimationListener() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    try {
+                        fragmentManager.beginTransaction()
+                                .remove(selectableItemFragment)
+                                .commitAllowingStateLoss();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            view.startAnimation(animation);
+        }
+    }
+
+    private void showSelectableItemFragment(final Fragment removableFragment) {
+        if (!(removableFragment instanceof ISelectableItemFragment)) {
+            throw new IllegalArgumentException("Item fragments must implement " + ISelectableItemFragment.class.getName());
+        }
+
+        if (getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG) != null) {
+            removeSelectableItemFragment();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getFragmentManager().beginTransaction()
+                            .setCustomAnimations(R.anim.slide_up, 0)
+                            .replace(R.id.panel, removableFragment, ISelectableItemFragment.TAG)
+                            .commit();
+                }
+            }, 500);
+        } else {
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.slide_up, 0)
+                    .replace(R.id.panel, removableFragment, ISelectableItemFragment.TAG)
+                    .commit();
         }
     }
 
