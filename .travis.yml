@@ -2,6 +2,7 @@ language: android
 jdk: oraclejdk7
 before_install:
  - chmod +x gradlew
+ - echo yes | android update sdk --all --filter build-tools-21.1.2 --no-ui --force > /dev/null
 
 env:
   matrix:
