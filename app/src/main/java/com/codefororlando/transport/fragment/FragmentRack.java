@@ -1,7 +1,6 @@
 package com.codefororlando.transport.fragment;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,17 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codefororlando.transport.MapsActivity;
-import com.codefororlando.transport.animation.EmptyAnimationListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.data.BikeRackItem;
 
-public class FragmentRack extends Fragment implements View.OnClickListener {
+public class FragmentRack extends Fragment implements View.OnClickListener, ISelectableItemFragment {
 
     public static final String TAG = FragmentRack.class.getName();
 
@@ -39,30 +35,6 @@ public class FragmentRack extends Fragment implements View.OnClickListener {
         fragment.setArguments(bundle);
 
         return fragment;
-    }
-
-    public void removeFragment() {
-        final View view = getView();
-        if (view == null) {
-            return;
-        }
-
-        final FragmentManager fragmentManager = getFragmentManager();
-        final Animation animation = new TranslateAnimation(0, 0, 0, view.getHeight());
-        animation.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
-        animation.setAnimationListener(new EmptyAnimationListener() {
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                try {
-                    fragmentManager.beginTransaction()
-                            .remove(FragmentRack.this)
-                            .commitAllowingStateLoss();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        view.startAnimation(animation);
     }
 
     @Override
