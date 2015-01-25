@@ -11,4 +11,4 @@ Want To Help Your City? Good, we could use your help. We are a Code for America 
 
 http://www.meetup.com/Code-For-Orlando/
 
-![Example Screenshot](https://cloud.githubusercontent.com/assets/1614281/4536298/e8f78d54-4dc3-11e4-847f-b9eed7ec98f4.png)
+![screenshot_2015-01-25-18-33-24](https://cloud.githubusercontent.com/assets/1614281/5893870/6ec88596-a4c2-11e4-83a2-e06b73015f01.png)
