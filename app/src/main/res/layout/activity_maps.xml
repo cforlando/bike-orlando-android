@@ -20,12 +20,7 @@
         map:uiZoomControls="false"
         map:uiZoomGestures="true"/>
 
-    <FrameLayout
-        android:id="@+id/panel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:clickable="true"/>
+    <include layout="@layout/detail_fragment_container"/>
 
 </com.codefororlando.transport.view.SlidingYRelativeLayout>
 

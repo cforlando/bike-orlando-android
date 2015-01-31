@@ -9,12 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fab_size_half"
-        android:background="?android:colorBackground">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?colorPrimaryDark"/>
+        android:background="@drawable/drop_shadow">
 
         <TextView
             android:id="@+id/rack_text_view_address"
@@ -22,19 +17,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_marginRight="@dimen/details_fragment_fab_plus_margin"
             android:ellipsize="end"
             android:gravity="center_vertical|start"
             android:lines="1"
-            android:padding="@dimen/rack_padding"
+            android:padding="@dimen/details_fragment_padding"
             android:singleLine="true"
-            android:text="@string/placeholder"/>
+            android:text="@string/placeholder"
+            tools:ignore="RtlHardcoded"/>
 
         <TextView
             android:id="@+id/rack_text_view_ownership"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/rack_text_view_address"
-            android:padding="@dimen/rack_padding"
+            android:padding="@dimen/details_fragment_padding"
             android:text="@string/rack_type"/>
 
         <TextView
@@ -43,7 +40,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="1"
-            android:padding="@dimen/rack_padding"
+            android:padding="@dimen/details_fragment_padding"
             android:text="@string/rack_ownership"
             android:visibility="gone"/>
 
@@ -55,7 +52,7 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/rack_text_view_address"
             android:lines="1"
-            android:padding="@dimen/rack_padding"
+            android:padding="@dimen/details_fragment_padding"
             android:text="@string/rack_capacity"/>
 
     </RelativeLayout>
