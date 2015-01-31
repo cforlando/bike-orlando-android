@@ -41,6 +41,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.5.87'
     //noinspection GradleDependency
     compile 'com.android.support:appcompat-v7:21.0.0'
+    compile 'com.android.support:recyclerview-v7:21.0.0'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'de.grundid.opendatalab:geojson-jackson:1.2'
 }

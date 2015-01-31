@@ -10,5 +10,8 @@
     <string name="rack_capacity">Capacity: ?</string>
     <string name="fab_route_to_point">Request a route to this point.</string>
     <string name="error_no_mapping_app">No navigation application found, unable to route to point.</string>
+    <!-- Display Features -->
+    <string name="display_feature_racks">Bike Racks</string>
+    <string name="display_feature_bike_paths">Bike Paths</string>
 
 </resources>

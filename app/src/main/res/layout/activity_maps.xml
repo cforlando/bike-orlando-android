@@ -20,7 +20,19 @@
         map:uiZoomControls="false"
         map:uiZoomGestures="true"/>
 
-    <include layout="@layout/detail_fragment_container"/>
+    <com.codefororlando.transport.view.FilterView
+        android:id="@+id/filter_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="@dimen/details_fragment_padding"
+        android:layout_marginRight="21dp"
+        tools:ignore="RtlHardcoded"/>
+
+    <include
+        android:id="@+id/details_fragment_container"
+        layout="@layout/detail_fragment_container"/>
 
 </com.codefororlando.transport.view.SlidingYRelativeLayout>
 
