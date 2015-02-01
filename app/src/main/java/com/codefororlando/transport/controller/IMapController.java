@@ -3,7 +3,6 @@ package com.codefororlando.transport.controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.codefororlando.transport.data.FeatureDescriptor;
 import com.google.android.gms.maps.GoogleMap;
 
 public interface IMapController {

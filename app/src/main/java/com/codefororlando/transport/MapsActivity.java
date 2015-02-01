@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -74,7 +73,6 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         }
     };
     private static final int ZOOM_CITY = 11;
-    private static final String KEY_FIRST_RUN = "KEY_FIRST_RUN";
     private BikeMapController mapController;
     private GoogleMap map;
     private FilterView filterView;
@@ -100,13 +98,6 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         // FIXME Filter should save state to prevent ghost touch of recyclerview
         filterView.animateOnScreen(true);
         filterView.animateOnScreen(getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG) == null);
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putBoolean(KEY_FIRST_RUN, false);
     }
 
     @Override

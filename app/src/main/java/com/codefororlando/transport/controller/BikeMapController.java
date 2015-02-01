@@ -12,9 +12,10 @@
 package com.codefororlando.transport.controller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
-import com.codefororlando.transport.data.FeatureDescriptor;
 import com.codefororlando.transport.display.BikePathsFeature;
 import com.codefororlando.transport.display.BikeRacksFeature;
 import com.codefororlando.transport.display.IDisplayableFeature;
@@ -22,9 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Map manager handling async loading callbacks and interpretation as well as general instantiation
@@ -39,19 +38,20 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
             , BikeRacksFeature.class
     };
 
-    private final List<IDisplayableFeature> featureList;
     private final FeatureDescriptor[] featureDescriptors;
     private final Context context;
     private final GoogleMap map;
+    private final SharedPreferences sharedPreferences;
 
     public BikeMapController(Context context, GoogleMap map) {
         this.map = map;
         this.context = context;
-        featureList = new ArrayList<>(DISPLAYABLE_FEATURE_CLASSES.length);
         featureDescriptors = new FeatureDescriptor[DISPLAYABLE_FEATURE_CLASSES.length];
 
         map.setOnMarkerClickListener(this);
         map.setOnCameraChangeListener(this);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         for (int i = 0; i < DISPLAYABLE_FEATURE_CLASSES.length; i++) {
             Class displayableFeatureClass = DISPLAYABLE_FEATURE_CLASSES[i];
@@ -59,14 +59,13 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
                 final IDisplayableFeature displayableFeature = (IDisplayableFeature) displayableFeatureClass.newInstance();
                 displayableFeature.setController(this);
 
-                final FeatureDescriptor featureDescriptor = new FeatureDescriptor(displayableFeature.getFeatureName(), i);
-                featureDescriptor.setEnabled(displayableFeature.displayAtLaunch());
+                final FeatureDescriptor featureDescriptor = new FeatureDescriptor(displayableFeature, i);
+                featureDescriptor.setEnabled(sharedPreferences.getBoolean(featureDescriptor.getFeatureIdName(), displayableFeature.displayAtLaunch()));
 
-                if (featureDescriptor.isEnabled()) {
+                if (sharedPreferences.getBoolean(featureDescriptor.getFeatureIdName(), featureDescriptor.isEnabled())) {
                     displayableFeature.show();
                 }
 
-                featureList.add(displayableFeature);
                 featureDescriptors[i] = featureDescriptor;
             } catch (Exception e) {
                 throw new IllegalStateException("Failed to instantiate feature: " + displayableFeatureClass.getName(), e);
@@ -78,7 +77,12 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
     @Override
     public void toggleFeature(FeatureDescriptor featureDescriptor) {
         featureDescriptor.setEnabled(!featureDescriptor.isEnabled());
-        final IDisplayableFeature feature = featureList.get(featureDescriptor.getFeatureId());
+
+        sharedPreferences.edit()
+                .putBoolean(featureDescriptor.getFeatureIdName(), featureDescriptor.isEnabled())
+                .apply();
+
+        final IDisplayableFeature feature = featureDescriptor.getDisplayableFeature();
         if (featureDescriptor.isEnabled()) {
             feature.show();
         } else {
@@ -106,15 +110,15 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
     }
 
     public void destroy() {
-        for (IDisplayableFeature displayableFeature : featureList) {
-            displayableFeature.destroy();
+        for (FeatureDescriptor featureDescriptor : featureDescriptors) {
+            featureDescriptor.getDisplayableFeature().destroy();
         }
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        for (IDisplayableFeature displayableFeature : featureList) {
-            if (displayableFeature.onMarkerClick(marker))
+        for (FeatureDescriptor featureDescriptor : featureDescriptors) {
+            if (featureDescriptor.getDisplayableFeature().onMarkerClick(marker))
                 return true;
         }
 
@@ -123,8 +127,8 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        for (IDisplayableFeature displayableFeature : featureList) {
-            displayableFeature.onCameraChange(cameraPosition);
+        for (FeatureDescriptor featureDescriptor : featureDescriptors) {
+            featureDescriptor.getDisplayableFeature().onCameraChange(cameraPosition);
         }
     }
 
