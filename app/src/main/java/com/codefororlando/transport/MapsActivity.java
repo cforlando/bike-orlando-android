@@ -19,10 +19,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
@@ -32,6 +32,7 @@ import com.codefororlando.transport.controller.BikeMapController;
 import com.codefororlando.transport.data.BikeRackItem;
 import com.codefororlando.transport.fragment.FragmentRack;
 import com.codefororlando.transport.fragment.ISelectableItemFragment;
+import com.codefororlando.transport.view.FilterView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -76,12 +77,16 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
     private static final String KEY_FIRST_RUN = "KEY_FIRST_RUN";
     private BikeMapController mapController;
     private GoogleMap map;
+    private FilterView filterView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded(savedInstanceState);
+
+        filterView = (FilterView) findViewById(R.id.filter_view);
+        filterView.setMapController(mapController);
     }
 
     @Override
@@ -91,6 +96,10 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver,
                 new IntentFilter(ACTION_BIKE_MARKER_SELECTED));
+
+        // FIXME Filter should save state to prevent ghost touch of recyclerview
+        filterView.animateOnScreen(true);
+        filterView.animateOnScreen(getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG) == null);
     }
 
     @Override
@@ -119,11 +128,50 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void onBackPressed() {
-        Fragment fragment = getFragmentManager().findFragmentByTag(FragmentRack.TAG);
-        if (fragment != null && !fragment.isHidden()) {
+        Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+        if (filterView.isExpanded()) {
+            filterView.animateOpen(false);
+        } else if (fragment != null && !fragment.isHidden()) {
             removeSelectableItemFragment();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void removeSelectableItemFragment() {
+        final Fragment selectableItemFragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+        if (selectableItemFragment != null) {
+            final View view = selectableItemFragment.getView();
+            if (view == null) {
+                return;
+            }
+
+            final int animationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            {
+                final Animation animation = new TranslateAnimation(0, 0, 0, view.getHeight());
+                animation.setDuration(animationDuration);
+                animation.setInterpolator(new AccelerateDecelerateInterpolator());
+                filterView.startAnimation(animation);
+            }
+            {
+                final FragmentManager fragmentManager = getFragmentManager();
+                final Animation animation = new TranslateAnimation(0, 0, 0, view.getHeight());
+                animation.setDuration(animationDuration);
+                animation.setAnimationListener(new EmptyAnimationListener() {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        try {
+                            fragmentManager.beginTransaction()
+                                    .remove(selectableItemFragment)
+                                    .commitAllowingStateLoss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                view.startAnimation(animation);
+            }
         }
     }
 
@@ -153,34 +201,9 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
 
     @Override
     public void onMapClick(final LatLng latLng) {
+        filterView.animateOpen(false);
+        filterView.animateOnScreen(true);
         removeSelectableItemFragment();
-    }
-
-    private void removeSelectableItemFragment() {
-        final Fragment selectableItemFragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
-        if (selectableItemFragment != null) {
-            final View view = selectableItemFragment.getView();
-            if (view == null) {
-                return;
-            }
-
-            final FragmentManager fragmentManager = getFragmentManager();
-            final Animation animation = new TranslateAnimation(0, 0, 0, view.getHeight());
-            animation.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
-            animation.setAnimationListener(new EmptyAnimationListener() {
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    try {
-                        fragmentManager.beginTransaction()
-                                .remove(selectableItemFragment)
-                                .commitAllowingStateLoss();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            view.startAnimation(animation);
-        }
     }
 
     private void showSelectableItemFragment(final Fragment removableFragment) {
@@ -188,23 +211,13 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
             throw new IllegalArgumentException("Item fragments must implement " + ISelectableItemFragment.class.getName());
         }
 
-        if (getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG) != null) {
-            removeSelectableItemFragment();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getFragmentManager().beginTransaction()
-                            .setCustomAnimations(R.anim.slide_up, 0)
-                            .replace(R.id.panel, removableFragment, ISelectableItemFragment.TAG)
-                            .commit();
-                }
-            }, 500);
-        } else {
-            getFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.anim.slide_up, 0)
-                    .replace(R.id.panel, removableFragment, ISelectableItemFragment.TAG)
-                    .commit();
-        }
+        filterView.animateOnScreen(false);
+
+        getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_up, 0)
+                .replace(R.id.details_fragment_container, removableFragment, ISelectableItemFragment.TAG)
+                .commit();
+
     }
 
 }

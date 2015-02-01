@@ -13,6 +13,7 @@ package com.codefororlando.transport.loader;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.annotation.RawRes;
 import android.util.SparseArray;
 
@@ -77,6 +78,7 @@ public final class FeatureCollectionLoader {
 
     public static interface FeatureCollectionLoaderListener {
 
+        @NonNull
         Context getContext();
 
         void onFeatureCollectionLoaded(@RawRes int resourceId, FeatureCollection featureCollection);

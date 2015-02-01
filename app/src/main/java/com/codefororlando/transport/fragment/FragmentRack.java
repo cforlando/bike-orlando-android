@@ -1,5 +1,6 @@
 package com.codefororlando.transport.fragment;
 
+import android.animation.Animator;
 import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
@@ -13,12 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codefororlando.transport.MapsActivity;
+import com.codefororlando.transport.animation.EmptyAnimatorListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.data.BikeRackItem;
 
 public class FragmentRack extends Fragment implements View.OnClickListener, ISelectableItemFragment {
-
-    public static final String TAG = FragmentRack.class.getName();
 
     private TextView textViewRackAddress;
     private TextView textViewRackOwnership;
@@ -69,13 +69,18 @@ public class FragmentRack extends Fragment implements View.OnClickListener, ISel
         setBikeRackItem(getArguments().<BikeRackItem>getParcelable(MapsActivity.EXTRA_BIKE_RACK_ITEM));
 
         final View fabRouteToPoint = view.findViewById(R.id.fab_route_to_point);
-        fabRouteToPoint.setScaleY(0);
-        fabRouteToPoint.setScaleX(0);
         fabRouteToPoint.setOnClickListener(this);
         fabRouteToPoint.animate()
+                .setListener(new EmptyAnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        fabRouteToPoint.setScaleX(0);
+                        fabRouteToPoint.setScaleY(0);
+                    }
+                })
                 .scaleY(1)
                 .scaleX(1)
-                .setDuration(400)
+                .setDuration(getResources().getInteger(android.R.integer.config_mediumAnimTime))
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .start();
 

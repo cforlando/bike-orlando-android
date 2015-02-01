@@ -12,29 +12,18 @@
 package com.codefororlando.transport.controller;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.RawRes;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.annotation.NonNull;
 
-import com.codefororlando.transport.MapsActivity;
-import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.data.BikeRackItem;
-import com.codefororlando.transport.loader.FeatureCollectionLoader;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.codefororlando.transport.data.FeatureDescriptor;
+import com.codefororlando.transport.display.BikePathsFeature;
+import com.codefororlando.transport.display.BikeRacksFeature;
+import com.codefororlando.transport.display.IDisplayableFeature;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.iogistics.complexoverlaytiles.CustomTileProvider;
-
-import org.geojson.Feature;
-import org.geojson.FeatureCollection;
-import org.geojson.GeoJsonObject;
-import org.geojson.LineString;
-import org.geojson.LngLatAlt;
-import org.geojson.MultiLineString;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,112 +32,100 @@ import java.util.List;
  *
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
-public class BikeMapController implements FeatureCollectionLoader.FeatureCollectionLoaderListener,
-        GoogleMap.OnMarkerClickListener {
+public final class BikeMapController implements IMapController, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraChangeListener {
 
+    private static final Class[] DISPLAYABLE_FEATURE_CLASSES = new Class[]{
+            BikePathsFeature.class
+            , BikeRacksFeature.class
+    };
+
+    private final List<IDisplayableFeature> featureList;
+    private final FeatureDescriptor[] featureDescriptors;
     private final Context context;
-    private final BikeRackClusterManager bikeRackManager;
     private final GoogleMap map;
-
-    private boolean tileProviderAdded;
 
     public BikeMapController(Context context, GoogleMap map) {
         this.map = map;
         this.context = context;
+        featureList = new ArrayList<>(DISPLAYABLE_FEATURE_CLASSES.length);
+        featureDescriptors = new FeatureDescriptor[DISPLAYABLE_FEATURE_CLASSES.length];
 
-        bikeRackManager = new BikeRackClusterManager(context, map);
-        bikeRackManager.getMarkerCollection().setOnMarkerClickListener(this);
+        map.setOnMarkerClickListener(this);
+        map.setOnCameraChangeListener(this);
 
-        map.setOnCameraChangeListener(bikeRackManager);
-        map.setOnMarkerClickListener(bikeRackManager);
+        for (int i = 0; i < DISPLAYABLE_FEATURE_CLASSES.length; i++) {
+            Class displayableFeatureClass = DISPLAYABLE_FEATURE_CLASSES[i];
+            try {
+                final IDisplayableFeature displayableFeature = (IDisplayableFeature) displayableFeatureClass.newInstance();
+                displayableFeature.setController(this);
 
-        FeatureCollectionLoader.getInstance(this, R.raw.bike_parking);
-        FeatureCollectionLoader.getInstance(this, R.raw.bike_lanes);
-    }
+                final FeatureDescriptor featureDescriptor = new FeatureDescriptor(displayableFeature.getFeatureName(), i);
+                featureDescriptor.setEnabled(displayableFeature.displayAtLaunch());
 
-    private static ArrayList<ArrayList<LatLng>> featureCollectionToRoutes(FeatureCollection featureCollection) {
-        ArrayList<ArrayList<LatLng>> routes = new ArrayList<>();
+                if (featureDescriptor.isEnabled()) {
+                    displayableFeature.show();
+                }
 
-        for (Feature feature : featureCollection.getFeatures()) {
-            GeoJsonObject geometry = feature.getGeometry();
-            switch (geometry.getClass().getSimpleName()) {
-                case "LineString":
-                    LineString lineString = (LineString) geometry;
-                    routes.add(lineToRoute(lineString.getCoordinates()));
-                    break;
-                case "MultiLineString":
-                    MultiLineString multiLineString = (MultiLineString) geometry;
-                    for (List<LngLatAlt> line : multiLineString.getCoordinates()) {
-                        // TODO Not sure if it is correct to draw each of these as individual routes
-                        routes.add(lineToRoute(line));
-                    }
-                    break;
+                featureList.add(displayableFeature);
+                featureDescriptors[i] = featureDescriptor;
+            } catch (Exception e) {
+                throw new IllegalStateException("Failed to instantiate feature: " + displayableFeatureClass.getName(), e);
             }
         }
 
-        return routes;
-    }
-
-    private static ArrayList<LatLng> lineToRoute(List<LngLatAlt> points) {
-        ArrayList<LatLng> route = new ArrayList<>();
-
-        for (LngLatAlt lngLatAlt : points)
-            route.add(new LatLng(lngLatAlt.getLatitude(), lngLatAlt.getLongitude()));
-
-        return route;
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        BikeRackItem bikeRackItem = bikeRackManager.getBikeRackItem(marker);
-
-        Intent intent = new Intent(MapsActivity.ACTION_BIKE_MARKER_SELECTED);
-        intent.putExtra(MapsActivity.EXTRA_BIKE_RACK_ITEM, bikeRackItem);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
-        // Animate to the location manually as true is returned by the click to prevent the info window popup
-        map.animateCamera(CameraUpdateFactory.newLatLng(bikeRackItem.getPosition()));
-
-        // Return true to disable the info window popup. This inadvertently also disables animation to the position
-        return true;
+    public void toggleFeature(FeatureDescriptor featureDescriptor) {
+        featureDescriptor.setEnabled(!featureDescriptor.isEnabled());
+        final IDisplayableFeature feature = featureList.get(featureDescriptor.getFeatureId());
+        if (featureDescriptor.isEnabled()) {
+            feature.show();
+        } else {
+            feature.hide();
+        }
     }
 
+    @Override
+    public
+    @NonNull
+    FeatureDescriptor[] getFeatureDescriptors() {
+        return Arrays.copyOf(featureDescriptors, featureDescriptors.length);
+    }
+
+    @NonNull
     @Override
     public Context getContext() {
         return context;
     }
 
+    @NonNull
     @Override
-    public void onFeatureCollectionLoaded(@RawRes int resourceId, FeatureCollection featureCollection) {
-        switch (resourceId) {
-            case R.raw.bike_lanes:
-
-                if (!tileProviderAdded) {
-                    ArrayList<ArrayList<LatLng>> routes = featureCollectionToRoutes(featureCollection);
-                    CustomTileProvider customTileProvider = new CustomTileProvider(context, routes);
-                    TileOverlayOptions tileOverlayOptions = new TileOverlayOptions().tileProvider(customTileProvider);
-
-                    map.addTileOverlay(tileOverlayOptions);
-                    tileProviderAdded = true;
-                }
-
-                break;
-            case R.raw.bike_parking:
-                setBikeParking(featureCollection);
-                break;
-        }
+    public GoogleMap getMap() {
+        return map;
     }
 
     public void destroy() {
-        bikeRackManager.clearItems();
+        for (IDisplayableFeature displayableFeature : featureList) {
+            displayableFeature.destroy();
+        }
     }
 
-    private void setBikeParking(FeatureCollection featureCollection) {
-        for (Feature feature : featureCollection.getFeatures()) {
-            bikeRackManager.addItem(new BikeRackItem(feature));
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        for (IDisplayableFeature displayableFeature : featureList) {
+            if (displayableFeature.onMarkerClick(marker))
+                return true;
         }
 
-        bikeRackManager.cluster();
+        return false;
+    }
+
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+        for (IDisplayableFeature displayableFeature : featureList) {
+            displayableFeature.onCameraChange(cameraPosition);
+        }
     }
 
 }

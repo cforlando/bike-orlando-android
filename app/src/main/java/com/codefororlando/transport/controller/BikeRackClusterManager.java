@@ -5,7 +5,7 @@ import android.content.Context;
 import com.codefororlando.transport.data.BikeRackItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import com.google.maps.android.clustering.*;
+import com.google.maps.android.clustering.ClusterManager;
 
 public class BikeRackClusterManager extends ClusterManager<BikeRackItem> {
 
@@ -19,7 +19,7 @@ public class BikeRackClusterManager extends ClusterManager<BikeRackItem> {
 
     }
 
-    BikeRackItem getBikeRackItem(Marker marker) {
+    public BikeRackItem getBikeRackItem(Marker marker) {
         return bikeRackClusterRenderer.getClusterItem(marker);
     }
 

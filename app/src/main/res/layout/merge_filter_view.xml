@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- View hack to force bottom margin -->
+    <Space
+        android:id="@+id/space"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_alignParentBottom="true"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/space"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="@dimen/details_fragment_padding"
+        android:background="@color/feature_filter_bg"
+        tools:ignore="RtlHardcoded"/>
+
+    <ImageButton
+        android:id="@+id/fab_filter_features"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/fab_button_blue"
+        android:contentDescription="@string/fab_route_to_point"
+        android:elevation="@dimen/elevation_high"
+        android:src="@drawable/ic_action_settings"
+        android:tint="@android:color/white"
+        tools:ignore="RtlHardcoded,UnusedAttribute"/>
+
+</merge>
