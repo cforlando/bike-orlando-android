@@ -17,8 +17,8 @@ import android.widget.RelativeLayout;
 
 import com.codefororlando.transport.animation.EmptyAnimatorListener;
 import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.controller.FeatureDescriptor;
 import com.codefororlando.transport.controller.IMapController;
-import com.codefororlando.transport.data.FeatureDescriptor;
 
 public class FilterView extends RelativeLayout implements View.OnClickListener {
 

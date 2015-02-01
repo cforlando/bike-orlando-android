@@ -49,7 +49,6 @@ public final class BikeRackItem implements ClusterItem, Parcelable {
         this.ownership = ownership == null ? "" : ownership.trim();
         this.type = type == null ? "n/a" : type.trim();
         this.capacity = capacity == null ? 0 : Integer.parseInt(capacity);
-        System.out.println(capacity + " : " + this.capacity);
     }
 
     private BikeRackItem(Parcel parcel) {
