@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RawRes;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.codefororlando.transport.IBroadcasts;
 import com.codefororlando.transport.MapsActivity;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.controller.BikeRackClusterManager;
@@ -20,13 +21,18 @@ import com.google.android.gms.maps.model.Marker;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 
-public class BikeRacksFeature implements IDisplayableFeature {
+public class BikeRacksFeature implements IDisplayableFeature, IBroadcasts {
 
     private BikeRackClusterManager bikeRackManager;
     private IMapController mapController;
     private GoogleMap map;
     private boolean isShown;
     private FeatureCollection featureCollection;
+
+    @Override
+    public int getGroupId() {
+        return R.string.group_biking;
+    }
 
     @Override
     public int getFeatureName() {
@@ -44,8 +50,8 @@ public class BikeRacksFeature implements IDisplayableFeature {
             public boolean onMarkerClick(Marker marker) {
                 BikeRackItem bikeRackItem = bikeRackManager.getBikeRackItem(marker);
 
-                Intent intent = new Intent(MapsActivity.ACTION_BIKE_MARKER_SELECTED);
-                intent.putExtra(MapsActivity.EXTRA_BIKE_RACK_ITEM, bikeRackItem);
+                Intent intent = new Intent(ACTION_BIKE_MARKER_SELECTED);
+                intent.putExtra(EXTRA_BIKE_RACK_ITEM, bikeRackItem);
                 LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
 
                 // Animate to the location manually as true is returned by the click to prevent the info window popup
@@ -56,7 +62,7 @@ public class BikeRacksFeature implements IDisplayableFeature {
             }
         });
 
-        FeatureCollectionLoader.getInstance(this, R.raw.bike_parking);
+        FeatureCollectionLoader.load(this, R.raw.bike_parking);
     }
 
     @Override
@@ -114,11 +120,6 @@ public class BikeRacksFeature implements IDisplayableFeature {
                 setBikeParking(featureCollection);
                 break;
         }
-    }
-
-    @Override
-    public boolean displayAtLaunch() {
-        return true;
     }
 
     private void setBikeParking(FeatureCollection featureCollection) {

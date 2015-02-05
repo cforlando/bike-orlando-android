@@ -15,10 +15,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 
+import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.display.BikePathsFeature;
 import com.codefororlando.transport.display.BikeRacksFeature;
 import com.codefororlando.transport.display.IDisplayableFeature;
+import com.codefororlando.transport.display.ParkingFeature;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
@@ -36,6 +39,7 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
     private static final Class[] DISPLAYABLE_FEATURE_CLASSES = new Class[]{
             BikePathsFeature.class
             , BikeRacksFeature.class
+            , ParkingFeature.class
     };
 
     private final FeatureDescriptor[] featureDescriptors;
@@ -53,6 +57,12 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+        // Determine the default group to display
+        final TypedValue typedValue = new TypedValue();
+        context.getResources().getValue(R.string.default_selected_group, typedValue, true);
+        final int selectedDefaultGroup = typedValue.resourceId;
+
+        // Instantiate the display implementations and show the default or user selected items
         for (int i = 0; i < DISPLAYABLE_FEATURE_CLASSES.length; i++) {
             Class displayableFeatureClass = DISPLAYABLE_FEATURE_CLASSES[i];
             try {
@@ -60,9 +70,9 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
                 displayableFeature.setController(this);
 
                 final FeatureDescriptor featureDescriptor = new FeatureDescriptor(displayableFeature, i);
-                featureDescriptor.setEnabled(sharedPreferences.getBoolean(featureDescriptor.getFeatureIdName(), displayableFeature.displayAtLaunch()));
+                featureDescriptor.setEnabled(sharedPreferences.getBoolean(featureDescriptor.getFeatureName(), displayableFeature.getGroupId() == selectedDefaultGroup));
 
-                if (sharedPreferences.getBoolean(featureDescriptor.getFeatureIdName(), featureDescriptor.isEnabled())) {
+                if (sharedPreferences.getBoolean(featureDescriptor.getFeatureName(), featureDescriptor.isEnabled())) {
                     displayableFeature.show();
                 }
 
@@ -79,7 +89,7 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
         featureDescriptor.setEnabled(!featureDescriptor.isEnabled());
 
         sharedPreferences.edit()
-                .putBoolean(featureDescriptor.getFeatureIdName(), featureDescriptor.isEnabled())
+                .putBoolean(featureDescriptor.getFeatureName(), featureDescriptor.isEnabled())
                 .apply();
 
         final IDisplayableFeature feature = featureDescriptor.getDisplayableFeature();

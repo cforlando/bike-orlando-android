@@ -1,0 +1,64 @@
+55W Garage
+60 W. Pine St.
+Orlando, FL  32801
+28.54104,-81.38029
+
+Administration Center Garage
+300 Liberty Ave.
+Orlando, FL 32801
+28.53890,-81.37448
+
+Central Garage
+55 W. Central Blvd.
+Orlando, FL 32801
+28.54211,-81.38005
+
+Centroplex I Garage
+441 Revere St.
+Orlando, FL 32801
+28.45558,-81.37891
+
+Centroplex II Garage
+355 Alexander Place
+Orlando, FL  32801
+28.54868,-81.38364
+
+City Lot 9
+57 S. Hughey Ave.
+Orlando, FL 32801
+28.53842,-81.38306
+
+City Lot 10
+81 N. Hughey Ave.
+Orlando, FL 32801
+28.54218,-81.38290
+
+Courthouse Garage
+46 E. Amelia St.
+Orlando, FL 32801
+28.54921,-81.37869
+
+Garland Lot
+25 S. Garland Ave.
+Orlando, FL 32801
+28.54183,-81.38174
+
+Jefferson St. Garage
+62 W. Jefferson St.
+Orlando, FL 32801
+28.54417,-81.38046
+
+Library Garage
+112 E. Central Blvd.
+Orlando, FL  32801
+28.54204,-81.37698
+
+Parking Division Office
+53 W. Central Blvd.
+Orlando, FL  32801
+28.54232,-81.38041
+
+Washington St. Garage
+50 W. Washington St.
+Orlando, FL  32801
+28.54353,-81.38030
