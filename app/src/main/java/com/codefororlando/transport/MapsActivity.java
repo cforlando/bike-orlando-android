@@ -135,8 +135,13 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
     public void onBackPressed() {
         Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
         if (filterView.isExpanded()) {
+            // Close the FilterView if it is open
             filterView.animateOpen(false);
         } else if (fragment != null && !fragment.isHidden()) {
+            // Display the filter fab
+            filterView.animateOnScreen(true);
+
+            // Remove the on screen fragment
             removeSelectableItemFragment();
         } else {
             super.onBackPressed();
