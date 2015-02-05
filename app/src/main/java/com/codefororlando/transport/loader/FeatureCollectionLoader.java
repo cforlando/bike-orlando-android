@@ -23,14 +23,24 @@ import org.geojson.FeatureCollection;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Utility for asynchronously loading {@link FeatureCollection}s from disk. Once loaded, feature instances are retained
- * in memory for future use.
+ * Utility for asynchronously loading {@link FeatureCollection}s from disk. Once loaded, feature
+ * instances are retained in memory for future use.
  *
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
 public final class FeatureCollectionLoader {
+
+    /**
+     * Two thread cached executor service with 30 second shutdown on threads. This is optimal for
+     * fast loading during cold start of app.
+     */
+    private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(0, 2, 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     private static final SparseArray<FeatureCollectionLoader> featureCollectionLoaders = new SparseArray<>();
 
@@ -43,10 +53,7 @@ public final class FeatureCollectionLoader {
         this.resourceId = resourceId;
     }
 
-    public synchronized static void getInstance(FeatureCollectionLoaderListener
-                                                        featureCollectionLoaderListener,
-                                                @RawRes int resourceId) {
-
+    public synchronized static void load(FeatureCollectionLoaderListener featureCollectionLoaderListener, @RawRes int resourceId) {
         FeatureCollectionLoader loader = featureCollectionLoaders.get(resourceId);
 
         if (loader == null) {
@@ -54,7 +61,7 @@ public final class FeatureCollectionLoader {
             loader.setFeatureCollectionLoaderListener(featureCollectionLoaderListener);
             featureCollectionLoaders.put(resourceId, loader);
 
-            new FeatureCollectionLoaderTask(loader).execute((Void) null);
+            new FeatureCollectionLoaderTask(loader).executeOnExecutor(EXECUTOR_SERVICE);
         } else {
             loader.setFeatureCollectionLoaderListener(featureCollectionLoaderListener);
 

@@ -4,6 +4,16 @@
     <string name="app_name">Bike Orlando</string>
     <string name="placeholder">Placeholder</string>
     <string name="streetview_urlpath">file:///android_asset/streetview.html</string>
+    <!-- GROUPS -->
+    <string name="group_driving">Driving</string>
+    <string name="group_biking">Biking</string>
+    <string name="group_events">Events</string>
+    <!-- Event Listings -->
+    <string name="event_listings_url">http://www.toxicbakery.com/events/events.php</string>
+    <!-- PARKING -->
+    <string name="parking_price_hourly">Hourly</string>
+    <string name="parking_price_event">Event</string>
+    <string name="parking_price_max_daily">Daily</string>
     <!-- RACK -->
     <string name="rack_ownership">Owned by ?</string>
     <string name="rack_type">Type: ?</string>
@@ -13,5 +23,6 @@
     <!-- Display Features -->
     <string name="display_feature_racks">Bike Racks</string>
     <string name="display_feature_bike_paths">Bike Paths</string>
+    <string name="display_feature_parking">Parking</string>
 
 </resources>

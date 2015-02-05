@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.codefororlando.transport.view.SlidingYRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                          xmlns:tools="http://schemas.android.com/tools"
+                                                          android:layout_width="match_parent"
+                                                          android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_size_half"
+        android:background="@drawable/drop_shadow">
+
+        <TextView
+            android:id="@+id/parking_text_view_address"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="@dimen/details_fragment_fab_plus_margin"
+            android:ellipsize="end"
+            android:lines="1"
+            android:padding="@dimen/details_fragment_padding"
+            android:singleLine="true"
+            android:text="@string/placeholder"
+            tools:ignore="RtlHardcoded"/>
+
+        <TextView
+            android:id="@+id/parking_text_view_address_two"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/parking_text_view_address"
+            android:layout_toLeftOf="@+id/parking_grid_layout"
+            android:paddingBottom="@dimen/details_fragment_padding"
+            android:paddingLeft="@dimen/details_fragment_padding"
+            android:paddingRight="@dimen/details_fragment_padding"
+            android:text="@string/placeholder"
+            tools:ignore="RtlHardcoded"/>
+
+        <GridLayout
+            android:id="@+id/parking_grid_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/details_fragment_padding"
+            android:layout_marginTop="@dimen/fab_size_half"
+            android:paddingBottom="@dimen/details_fragment_padding"
+            android:paddingTop="2dp"
+            tools:ignore="RtlHardcoded">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/details_fragment_padding"
+                android:layout_row="0"
+                android:text="@string/parking_price_hourly"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/details_fragment_padding"
+                android:layout_row="1"
+                android:text="@string/parking_price_event"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/details_fragment_padding"
+                android:layout_row="2"
+                android:text="@string/parking_price_max_daily"/>
+
+            <TextView
+                android:id="@+id/parking_price_hourly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_row="0"
+                android:text="@string/placeholder"/>
+
+            <TextView
+                android:id="@+id/parking_price_event"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_row="1"
+                android:text="@string/placeholder"/>
+
+            <TextView
+                android:id="@+id/parking_price_daily_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_row="2"
+                android:text="@string/placeholder"/>
+
+        </GridLayout>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/fab_route_to_point"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:background="@drawable/fab_button_orange"
+        android:contentDescription="@string/fab_route_to_point"
+        android:elevation="@dimen/elevation_high"
+        android:src="@drawable/parkingpinpoint"
+        android:tint="@android:color/white"
+        tools:ignore="UnusedAttribute"/>
+
+</com.codefororlando.transport.view.SlidingYRelativeLayout>

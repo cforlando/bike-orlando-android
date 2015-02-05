@@ -16,32 +16,33 @@ import android.widget.Toast;
 import com.codefororlando.transport.MapsActivity;
 import com.codefororlando.transport.animation.EmptyAnimatorListener;
 import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.data.ParkingItem;
 
-public class FragmentRack extends Fragment implements View.OnClickListener, ISelectableItemFragment {
+public class FragmentParking extends Fragment implements View.OnClickListener, ISelectableItemFragment {
 
-    private TextView textViewRackAddress;
-    private TextView textViewRackOwnership;
-    private TextView textViewRackType;
-    private TextView textViewRackCapacity;
+    private TextView textViewParkingAddress;
+    private TextView textViewParkingAddressTwo;
+    private TextView textViewParkingHourly;
+    private TextView textViewParkingEvent;
+    private TextView textViewParkingDailyMax;
 
-    private BikeRackItem bikeRackItem;
+    private ParkingItem parkingItem;
 
-    public static Fragment newInstance(BikeRackItem bikeRackItem) {
+    public static Fragment newInstance(ParkingItem parkingItem) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(MapsActivity.EXTRA_BIKE_RACK_ITEM, bikeRackItem);
+        bundle.putParcelable(MapsActivity.EXTRA_PARKING_ITEM, parkingItem);
 
-        Fragment fragment = new FragmentRack();
+        Fragment fragment = new FragmentParking();
         fragment.setArguments(bundle);
 
         return fragment;
     }
 
     @Override
-    public void onClick(final View v) {
+    public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_route_to_point:
-                final Uri geoLocation = Uri.parse("geo:0,0?q=" + bikeRackItem.getAddress());
+                final Uri geoLocation = Uri.parse("geo:0,0?q=" + parkingItem.getAddress());
                 final Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(geoLocation);
                 if (intent.resolveActivity(getActivity().getPackageManager()) == null) {
@@ -57,14 +58,15 @@ public class FragmentRack extends Fragment implements View.OnClickListener, ISel
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_rack, container, false);
+        final View view = inflater.inflate(R.layout.fragment_parking, container, false);
 
-        textViewRackAddress = (TextView) view.findViewById(R.id.rack_text_view_address);
-        textViewRackOwnership = (TextView) view.findViewById(R.id.rack_text_view_ownership);
-        textViewRackType = (TextView) view.findViewById(R.id.rack_text_view_type);
-        textViewRackCapacity = (TextView) view.findViewById(R.id.rack_text_view_capacity);
+        textViewParkingAddress = (TextView) view.findViewById(R.id.parking_text_view_address);
+        textViewParkingAddressTwo = (TextView) view.findViewById(R.id.parking_text_view_address_two);
+        textViewParkingHourly = (TextView) view.findViewById(R.id.parking_price_hourly);
+        textViewParkingEvent = (TextView) view.findViewById(R.id.parking_price_event);
+        textViewParkingDailyMax = (TextView) view.findViewById(R.id.parking_price_daily_max);
 
-        setBikeRackItem(getArguments().<BikeRackItem>getParcelable(MapsActivity.EXTRA_BIKE_RACK_ITEM));
+        setParkingItem(getArguments().<ParkingItem>getParcelable(MapsActivity.EXTRA_PARKING_ITEM));
 
         final View fabRouteToPoint = view.findViewById(R.id.fab_route_to_point);
         fabRouteToPoint.setOnClickListener(this);
@@ -85,21 +87,24 @@ public class FragmentRack extends Fragment implements View.OnClickListener, ISel
         return view;
     }
 
-    public void setBikeRackItem(BikeRackItem bikeRackItem) {
-        this.bikeRackItem = bikeRackItem;
-        updateRack();
+    public void setParkingItem(ParkingItem parkingItem) {
+        this.parkingItem = parkingItem;
+        updateParking();
     }
 
-    private void updateRack() {
-        final String ownership = getString(R.string.rack_ownership).replace("?", bikeRackItem.getOwnership());
-        final String type = getString(R.string.rack_type).replace("?", bikeRackItem.getType());
-        final String capacity = getString(R.string.rack_capacity).replace("?",
-                Integer.toString(bikeRackItem.getCapacity()));
+    private void updateParking() {
+        // Address
+        final String address = parkingItem.getAddress();
+        final int newLineIdx = address.indexOf("\n");
+        textViewParkingAddress.setText(address.substring(0, newLineIdx));
+        textViewParkingAddressTwo.setText(address.substring(newLineIdx + 1, address.length()));
 
-        textViewRackAddress.setText(bikeRackItem.getAddress());
-        textViewRackOwnership.setText(ownership);
-        textViewRackType.setText(type);
-        textViewRackCapacity.setText(capacity);
+        // Prices
+        final ParkingItem.Price price = parkingItem.getPrice();
+        textViewParkingHourly.setText(price.getNormal());
+        textViewParkingEvent.setText(price.getEvent());
+        textViewParkingDailyMax.setText(price.getDailyMax());
     }
+
 
 }

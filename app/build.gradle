@@ -44,4 +44,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.0'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'de.grundid.opendatalab:geojson-jackson:1.2'
+    compile 'com.koushikdutta.ion:ion:2.0.5'
 }

@@ -29,6 +29,8 @@ import com.codefororlando.transport.animation.EmptyAnimationListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.controller.BikeMapController;
 import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.data.ParkingItem;
+import com.codefororlando.transport.fragment.FragmentParking;
 import com.codefororlando.transport.fragment.FragmentRack;
 import com.codefororlando.transport.fragment.ISelectableItemFragment;
 import com.codefororlando.transport.view.FilterView;
@@ -41,19 +43,7 @@ import com.google.android.gms.maps.model.LatLng;
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
 @SuppressWarnings("WeakerAccess")
-public class MapsActivity extends Activity implements GoogleMap.OnMapClickListener {
-
-    /**
-     * Bike item marker selected.
-     * <p/>
-     * Always includes {@link #EXTRA_BIKE_RACK_ITEM}.
-     */
-    public static final String ACTION_BIKE_MARKER_SELECTED = "ACTION_BIKE_MARKER_SELECTED";
-
-    /**
-     * {@link com.codefororlando.transport.data.BikeRackItem} instance.
-     */
-    public static final String EXTRA_BIKE_RACK_ITEM = "EXTRA_BIKE_RACK_ITEM";
+public class MapsActivity extends Activity implements GoogleMap.OnMapClickListener, IBroadcasts {
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -62,17 +52,38 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
                 case ACTION_BIKE_MARKER_SELECTED: {
                     final BikeRackItem bikeRackItem = intent.getParcelableExtra(EXTRA_BIKE_RACK_ITEM);
                     Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+                    if (fragment != null && !fragment.getClass().equals(FragmentRack.class)) {
+                        getFragmentManager().beginTransaction()
+                                .remove(fragment)
+                                .commit();
+                        fragment = null;
+                    }
                     if (fragment == null) {
-                        fragment = FragmentRack.newInstance(bikeRackItem);
-                        showSelectableItemFragment(fragment);
+                        showSelectableItemFragment(FragmentRack.newInstance(bikeRackItem));
                     } else {
                         ((FragmentRack) fragment).setBikeRackItem(bikeRackItem);
                     }
+                    break;
+                }
+                case ACTION_PARKING_MARKER_SELECTED: {
+                    final ParkingItem parkingItem = intent.getParcelableExtra(EXTRA_PARKING_ITEM);
+                    Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+                    if (fragment != null && !fragment.getClass().equals(FragmentParking.class)) {
+                        getFragmentManager().beginTransaction()
+                                .remove(fragment)
+                                .commit();
+                        fragment = null;
+                    }
+                    if (fragment == null) {
+                        showSelectableItemFragment(FragmentParking.newInstance(parkingItem));
+                    } else {
+                        ((FragmentParking) fragment).setParkingItem(parkingItem);
+                    }
+                    break;
                 }
             }
         }
     };
-    private static final int ZOOM_CITY = 11;
     private BikeMapController mapController;
     private GoogleMap map;
     private FilterView filterView;
@@ -92,8 +103,11 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         super.onResume();
         setUpMapIfNeeded(null);
 
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver,
-                new IntentFilter(ACTION_BIKE_MARKER_SELECTED));
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_BIKE_MARKER_SELECTED);
+        intentFilter.addAction(ACTION_PARKING_MARKER_SELECTED);
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver, intentFilter);
 
         // FIXME Filter should save state to prevent ghost touch of recyclerview
         filterView.animateOnScreen(true);
@@ -177,11 +191,10 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
             mapController = new BikeMapController(this, map);
 
             if (savedInstanceState == null) {
-                // Look at Orlando from state level
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
-                // Animate zoom to city level
-                map.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_CITY));
+                // Animate zoom to city level and move to Orlando
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(28.5383355d, -81.3792365d), 11));
             }
         }
 

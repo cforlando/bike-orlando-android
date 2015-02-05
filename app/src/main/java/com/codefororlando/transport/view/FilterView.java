@@ -3,6 +3,7 @@ package com.codefororlando.transport.view;
 import android.animation.Animator;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -14,11 +15,16 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckedTextView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.codefororlando.transport.animation.EmptyAnimatorListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.controller.FeatureDescriptor;
 import com.codefororlando.transport.controller.IMapController;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class FilterView extends RelativeLayout implements View.OnClickListener {
 
@@ -93,9 +99,21 @@ public class FilterView extends RelativeLayout implements View.OnClickListener {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         buttonFilterFeatures = findViewById(R.id.fab_filter_features);
 
-        adapter = new FeatureDescriptorAdapter(new ViewHolder.OnFeatureToggledListener() {
+        adapter = new FeatureDescriptorAdapter(new ViewHolderFeature.OnFeatureToggledListener() {
             @Override
             public void onFeatureToggled(FeatureDescriptor featureDescriptor) {
+
+                // Disable any enabled features not in the group
+                final int groupId = featureDescriptor.getGroupId();
+                for (int i = 0, j = adapter.getFeatureDescriptorCount(); i < j; ++i) {
+                    final FeatureDescriptor descriptor = adapter.getFeatureDescriptor(i);
+                    if (descriptor.isEnabled() && descriptor.getGroupId() != groupId) {
+                        mapController.toggleFeature(descriptor);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+
+                // Enable the selected feature
                 mapController.toggleFeature(featureDescriptor);
             }
         });
@@ -159,49 +177,134 @@ public class FilterView extends RelativeLayout implements View.OnClickListener {
         adapter.setFeatureDescriptors(mapController.getFeatureDescriptors());
     }
 
-    private static final class FeatureDescriptorAdapter extends RecyclerView.Adapter<ViewHolder> {
+    private static final class FeatureDescriptorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private final ViewHolder.OnFeatureToggledListener onFeatureToggledListener;
+        private static final int TYPE_GROUP_ID = 1;
+        private static final int TYPE_FEATURE = 2;
+
+        private final ViewHolderFeature.OnFeatureToggledListener onFeatureToggledListener;
         private FeatureDescriptor[] featureDescriptors = new FeatureDescriptor[0];
+        private Object[] listItems = new Object[0];
 
-        private FeatureDescriptorAdapter(ViewHolder.OnFeatureToggledListener onFeatureToggledListener) {
+        private FeatureDescriptorAdapter(ViewHolderFeature.OnFeatureToggledListener onFeatureToggledListener) {
             this.onFeatureToggledListener = onFeatureToggledListener;
         }
 
         public void setFeatureDescriptors(@NonNull FeatureDescriptor[] featureDescriptors) {
+            Arrays.sort(featureDescriptors);
             this.featureDescriptors = featureDescriptors;
+
+            List<Object> listItems = new LinkedList<>();
+            int currentGroup = 0;
+            for (final FeatureDescriptor featureDescriptor : featureDescriptors) {
+                final int groupId = featureDescriptor.getGroupId();
+                if (groupId != currentGroup) {
+                    currentGroup = groupId;
+                    listItems.add(new GroupIdItem(featureDescriptor.getGroupId()));
+                }
+                listItems.add(featureDescriptor);
+            }
+
+            this.listItems = listItems.toArray(new Object[listItems.size()]);
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int type) {
             final LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-            final View view = inflater.inflate(android.R.layout.simple_list_item_multiple_choice, viewGroup, false);
-            return new ViewHolder(onFeatureToggledListener, view);
+            switch (type) {
+                case TYPE_GROUP_ID: {
+                    final View view = inflater.inflate(android.R.layout.simple_list_item_1, viewGroup, false);
+                    return new ViewHolderGroup(view);
+                }
+                case TYPE_FEATURE: {
+                    final View view = inflater.inflate(android.R.layout.simple_list_item_multiple_choice, viewGroup, false);
+                    return new ViewHolderFeature(onFeatureToggledListener, view);
+                }
+            }
+
+            throw new IllegalArgumentException("Unknown view type");
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int position) {
-            viewHolder.setFeatureDescriptor(getFeatureDescriptor(position));
+        public int getItemViewType(int position) {
+            final Class<?> clazz = listItems[position].getClass();
+            if (clazz.equals(GroupIdItem.class)) {
+                return TYPE_GROUP_ID;
+            } else if (clazz.equals(FeatureDescriptor.class)) {
+                return TYPE_FEATURE;
+            }
+
+            throw new IllegalStateException("Unknown object in list");
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+            final Class<?> clazz = listItems[position].getClass();
+            if (clazz.equals(GroupIdItem.class)) {
+                ((ViewHolderGroup) viewHolder).setGroupIdItem((GroupIdItem) listItems[position]);
+            } else if (clazz.equals(FeatureDescriptor.class)) {
+                ((ViewHolderFeature) viewHolder).setFeatureDescriptor((FeatureDescriptor) listItems[position]);
+            } else {
+                throw new IllegalStateException("Unknown ViewHolder");
+            }
         }
 
         @Override
         public int getItemCount() {
-            return featureDescriptors.length;
+            return listItems.length;
         }
 
         private FeatureDescriptor getFeatureDescriptor(int position) {
             return featureDescriptors[position];
         }
 
+        private int getFeatureDescriptorCount() {
+            return featureDescriptors.length;
+        }
+
     }
 
-    private static final class ViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
+    private static final class GroupIdItem {
+
+        private final
+        @StringRes
+        int groupId;
+
+        private GroupIdItem(@StringRes int groupName) {
+            this.groupId = groupName;
+        }
+
+        @StringRes
+        int getGroupId() {
+            return groupId;
+        }
+
+    }
+
+    private static final class ViewHolderGroup extends RecyclerView.ViewHolder {
+
+        private final TextView textViewGroupName;
+
+        public ViewHolderGroup(View itemView) {
+            super(itemView);
+
+            textViewGroupName = (TextView) itemView.findViewById(android.R.id.text1);
+            textViewGroupName.setBackgroundColor(itemView.getResources().getColor(R.color.feature_filter_group_bg));
+        }
+
+        private void setGroupIdItem(GroupIdItem groupNameItem) {
+            textViewGroupName.setText(groupNameItem.getGroupId());
+        }
+
+    }
+
+    private static final class ViewHolderFeature extends RecyclerView.ViewHolder implements OnClickListener {
 
         private final CheckedTextView checkedTextView;
-        private final ViewHolder.OnFeatureToggledListener onFeatureToggledListener;
+        private final ViewHolderFeature.OnFeatureToggledListener onFeatureToggledListener;
         private FeatureDescriptor featureDescriptor;
 
-        public ViewHolder(ViewHolder.OnFeatureToggledListener onFeatureToggledListener, View itemView) {
+        public ViewHolderFeature(ViewHolderFeature.OnFeatureToggledListener onFeatureToggledListener, View itemView) {
             super(itemView);
 
             this.onFeatureToggledListener = onFeatureToggledListener;
@@ -211,7 +314,7 @@ public class FilterView extends RelativeLayout implements View.OnClickListener {
 
         private void setFeatureDescriptor(FeatureDescriptor featureDescriptor) {
             this.featureDescriptor = featureDescriptor;
-            checkedTextView.setText(featureDescriptor.getFeatureName());
+            checkedTextView.setText(featureDescriptor.getFeatureId());
             checkedTextView.setChecked(featureDescriptor.isEnabled());
         }
 

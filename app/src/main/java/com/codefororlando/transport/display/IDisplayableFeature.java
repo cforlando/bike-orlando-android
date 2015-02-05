@@ -1,5 +1,6 @@
 package com.codefororlando.transport.display;
 
+import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 
 import com.codefororlando.transport.controller.IMapController;
@@ -8,6 +9,16 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
 
 public interface IDisplayableFeature extends FeatureCollectionLoader.FeatureCollectionLoaderListener {
+
+    /**
+     * The id of the group this feature belongs to. Multiple items from a group can be displayed at
+     * the same time but only one group may be on screen at any given time.
+     *
+     * @return resource id of the group
+     */
+    public
+    @StringRes
+    int getGroupId();
 
     /**
      * The name of the feature represented by a String resource.
@@ -54,12 +65,5 @@ public interface IDisplayableFeature extends FeatureCollectionLoader.FeatureColl
      * @param cameraPosition new camera position.
      */
     public void onCameraChange(CameraPosition cameraPosition);
-
-    /**
-     * Indicate if the feature should be turned on at the start of the application.
-     *
-     * @return true if should be shown at cold start
-     */
-    public boolean displayAtLaunch();
 
 }
