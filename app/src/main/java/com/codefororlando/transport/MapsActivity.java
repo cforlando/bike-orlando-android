@@ -29,7 +29,9 @@ import com.codefororlando.transport.animation.EmptyAnimationListener;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.controller.BikeMapController;
 import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.data.EventItem;
 import com.codefororlando.transport.data.ParkingItem;
+import com.codefororlando.transport.fragment.FragmentEvent;
 import com.codefororlando.transport.fragment.FragmentParking;
 import com.codefororlando.transport.fragment.FragmentRack;
 import com.codefororlando.transport.fragment.ISelectableItemFragment;
@@ -81,6 +83,22 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
                     }
                     break;
                 }
+                case ACTION_EVENT_MARKER_SELECTED: {
+                    final EventItem eventItem = intent.getParcelableExtra(EXTRA_EVENT_ITEM);
+                    Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+                    if (fragment != null && !fragment.getClass().equals(FragmentEvent.class)) {
+                        getFragmentManager().beginTransaction()
+                                .remove(fragment)
+                                .commit();
+                        fragment = null;
+                    }
+                    if (fragment == null) {
+                        showSelectableItemFragment(FragmentEvent.newInstance(eventItem));
+                    } else {
+                        ((FragmentEvent) fragment).setEventItem(eventItem);
+                    }
+                    break;
+                }
             }
         }
     };
@@ -106,6 +124,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_BIKE_MARKER_SELECTED);
         intentFilter.addAction(ACTION_PARKING_MARKER_SELECTED);
+        intentFilter.addAction(ACTION_EVENT_MARKER_SELECTED);
 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver, intentFilter);
 

@@ -38,11 +38,11 @@ public class BitmapUtility {
         // Determine scale
         final float scale;
         if (overlay.getWidth() == overlay.getHeight()) {
-            scale = 0.75f;
+            scale = 0.65f;
         } else if (overlay.getWidth() > overlay.getHeight()) {
-            scale = overlay.getWidth() / icon.getWidth() * 0.75f;
+            scale = overlay.getWidth() / icon.getWidth() * 0.65f;
         } else {
-            scale = overlay.getHeight() / icon.getHeight() * 0.75f;
+            scale = overlay.getHeight() / icon.getHeight() * 0.65f;
         }
 
         // Calculate applied scale and centering

@@ -20,6 +20,7 @@ import android.util.TypedValue;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.display.BikePathsFeature;
 import com.codefororlando.transport.display.BikeRacksFeature;
+import com.codefororlando.transport.display.EventFeature;
 import com.codefororlando.transport.display.IDisplayableFeature;
 import com.codefororlando.transport.display.ParkingFeature;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +41,7 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
             BikePathsFeature.class
             , BikeRacksFeature.class
             , ParkingFeature.class
+            , EventFeature.class
     };
 
     private final FeatureDescriptor[] featureDescriptors;

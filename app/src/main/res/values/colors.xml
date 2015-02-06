@@ -5,8 +5,10 @@
     <color name="colorPrimary">#ffffd26c</color>
     <color name="colorPrimaryDark">#fff7b334</color>
     <color name="colorPrimaryDarkBlue">#ff01579B</color>
+    <color name="colorPrimaryPurple">#ff7d43ab</color>
     <color name="colorAccent">#ff6d00</color>
     <color name="colorAccentBlue">#ff0091ea</color>
+    <color name="colorAccentPurple">#ff9e5cd1</color>
     <color name="colorTextPrimary">#ffffffff</color>
     <color name="colorTextPrimaryInverse">#ff000000</color>
     <!-- MAP -->
