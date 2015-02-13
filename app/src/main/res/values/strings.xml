@@ -11,7 +11,7 @@
     <!-- EVENTS -->
     <string name="event_listings_url">http://www.toxicbakery.com/events/events.php</string>
     <string name="event_button_list">See Events</string>
-    <string name="event_price_range_format">$%1$s - $%2$s</string>
+    <string name="event_price_range_format">Tickets from $%1$s - $%2$s</string>
     <string name="events_error_loading">Failed to load events from remote server.</string>
     <!-- PARKING -->
     <string name="parking_price_hourly">Hourly</string>
