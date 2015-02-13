@@ -8,8 +8,11 @@
     <string name="group_driving">Driving</string>
     <string name="group_biking">Biking</string>
     <string name="group_events">Events</string>
-    <!-- Event Listings -->
+    <!-- EVENTS -->
     <string name="event_listings_url">http://www.toxicbakery.com/events/events.php</string>
+    <string name="event_button_list">See Events</string>
+    <string name="event_price_range_format">Tickets from $%1$s - $%2$s</string>
+    <string name="events_error_loading">Failed to load events from remote server.</string>
     <!-- PARKING -->
     <string name="parking_price_hourly">Hourly</string>
     <string name="parking_price_event">Event</string>
@@ -24,5 +27,6 @@
     <string name="display_feature_racks">Bike Racks</string>
     <string name="display_feature_bike_paths">Bike Paths</string>
     <string name="display_feature_parking">Parking</string>
+    <string name="display_feature_events_ticketed">Ticketed</string>
 
 </resources>

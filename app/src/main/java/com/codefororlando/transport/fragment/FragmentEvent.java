@@ -13,26 +13,24 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codefororlando.transport.EventListActivity;
 import com.codefororlando.transport.IBroadcasts;
 import com.codefororlando.transport.animation.EmptyAnimatorListener;
 import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.data.ParkingItem;
+import com.codefororlando.transport.data.EventItem;
 
-public class FragmentParking extends Fragment implements View.OnClickListener, ISelectableItemFragment, IBroadcasts {
+public class FragmentEvent extends Fragment implements View.OnClickListener, ISelectableItemFragment, IBroadcasts {
 
-    private TextView textViewParkingAddress;
-    private TextView textViewParkingAddressTwo;
-    private TextView textViewParkingHourly;
-    private TextView textViewParkingEvent;
-    private TextView textViewParkingDailyMax;
+    private TextView textViewEventName;
+    private TextView textViewEventAddress;
 
-    private ParkingItem parkingItem;
+    private EventItem eventItem;
 
-    public static Fragment newInstance(ParkingItem parkingItem) {
+    public static Fragment newInstance(EventItem eventItem) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(EXTRA_PARKING_ITEM, parkingItem);
+        bundle.putParcelable(EXTRA_EVENT_ITEM, eventItem);
 
-        Fragment fragment = new FragmentParking();
+        Fragment fragment = new FragmentEvent();
         fragment.setArguments(bundle);
 
         return fragment;
@@ -41,8 +39,8 @@ public class FragmentParking extends Fragment implements View.OnClickListener, I
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab_route_to_point:
-                final Uri geoLocation = Uri.parse("geo:0,0?q=" + parkingItem.getAddress());
+            case R.id.fab_route_to_point: {
+                final Uri geoLocation = Uri.parse("geo:0,0?q=" + eventItem.getName() + ", " + eventItem.getAddress());
                 final Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(geoLocation);
                 if (intent.resolveActivity(getActivity().getPackageManager()) == null) {
@@ -52,21 +50,26 @@ public class FragmentParking extends Fragment implements View.OnClickListener, I
                     startActivity(intent);
                 }
                 break;
+            }
+            case R.id.event_button_list: {
+                final Intent intent = new Intent(getActivity(), EventListActivity.class);
+                intent.putExtra(EXTRA_EVENT_ITEM, eventItem);
+                startActivity(intent);
+                break;
+            }
         }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_parking, container, false);
+        final View view = inflater.inflate(R.layout.fragment_event, container, false);
 
-        textViewParkingAddress = (TextView) view.findViewById(R.id.parking_text_view_address);
-        textViewParkingAddressTwo = (TextView) view.findViewById(R.id.parking_text_view_address_two);
-        textViewParkingHourly = (TextView) view.findViewById(R.id.parking_price_hourly);
-        textViewParkingEvent = (TextView) view.findViewById(R.id.parking_price_event);
-        textViewParkingDailyMax = (TextView) view.findViewById(R.id.parking_price_daily_max);
+        textViewEventName = (TextView) view.findViewById(R.id.event_text_view_name);
+        textViewEventAddress = (TextView) view.findViewById(R.id.event_text_view_address);
+        view.findViewById(R.id.event_button_list).setOnClickListener(this);
 
-        setParkingItem(getArguments().<ParkingItem>getParcelable(EXTRA_PARKING_ITEM));
+        setEventItem(getArguments().<EventItem>getParcelable(EXTRA_EVENT_ITEM));
 
         final View fabRouteToPoint = view.findViewById(R.id.fab_route_to_point);
         fabRouteToPoint.setOnClickListener(this);
@@ -87,24 +90,14 @@ public class FragmentParking extends Fragment implements View.OnClickListener, I
         return view;
     }
 
-    public void setParkingItem(ParkingItem parkingItem) {
-        this.parkingItem = parkingItem;
-        updateParking();
+    public void setEventItem(EventItem eventItem) {
+        this.eventItem = eventItem;
+        updateEvent();
     }
 
-    private void updateParking() {
-        // Address
-        final String address = parkingItem.getAddress();
-        final int newLineIdx = address.indexOf("\n");
-        textViewParkingAddress.setText(address.substring(0, newLineIdx));
-        textViewParkingAddressTwo.setText(address.substring(newLineIdx + 1, address.length()));
-
-        // Prices
-        final ParkingItem.Price price = parkingItem.getPrice();
-        textViewParkingHourly.setText(price.getNormal());
-        textViewParkingEvent.setText(price.getEvent());
-        textViewParkingDailyMax.setText(price.getDailyMax());
+    private void updateEvent() {
+        textViewEventName.setText(eventItem.getName());
+        textViewEventAddress.setText(eventItem.getAddress());
     }
-
 
 }

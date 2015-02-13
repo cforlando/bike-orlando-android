@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.codefororlando.transport.view.SlidingYRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                          xmlns:tools="http://schemas.android.com/tools"
+                                                          android:layout_width="match_parent"
+                                                          android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_size_half"
+        android:background="@drawable/drop_shadow">
+
+        <TextView
+            android:id="@+id/event_text_view_name"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="@dimen/details_fragment_fab_plus_margin"
+            android:ellipsize="end"
+            android:lines="1"
+            android:padding="@dimen/details_fragment_padding"
+            android:singleLine="true"
+            android:text="@string/placeholder"
+            tools:ignore="RtlHardcoded"/>
+
+        <TextView
+            android:id="@+id/event_text_view_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/event_text_view_name"
+            android:layout_toLeftOf="@+id/event_button_list"
+            android:paddingBottom="@dimen/details_fragment_padding"
+            android:paddingLeft="@dimen/details_fragment_padding"
+            android:paddingRight="@dimen/details_fragment_padding"
+            android:text="@string/placeholder"
+            tools:ignore="RtlHardcoded"/>
+
+        <Button
+            android:id="@+id/event_button_list"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/listPreferredItemHeightSmall"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/details_fragment_padding"
+            android:layout_marginRight="@dimen/details_fragment_padding"
+            android:layout_marginTop="@dimen/fab_size_half"
+            android:text="@string/event_button_list"
+            android:textColor="?colorAccent"
+            tools:ignore="RtlHardcoded"/>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/fab_route_to_point"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:background="@drawable/fab_button_purple"
+        android:contentDescription="@string/fab_route_to_point"
+        android:elevation="@dimen/elevation_high"
+        android:src="@drawable/eventpintpoint"
+        android:tint="@android:color/white"
+        tools:ignore="UnusedAttribute"/>
+
+</com.codefororlando.transport.view.SlidingYRelativeLayout>

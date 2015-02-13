@@ -50,7 +50,7 @@ public class ParkingItem implements Parcelable {
         position = new LatLng(parcel.readDouble(), parcel.readDouble());
         address = parcel.readString();
         type = parcel.readString();
-        price = null;
+        price = (Price) parcel.readValue(Price.class.getClassLoader());
     }
 
     public LatLng getPosition() {
@@ -76,7 +76,11 @@ public class ParkingItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
+        dest.writeDouble(position.latitude);
+        dest.writeDouble(position.longitude);
+        dest.writeString(address);
+        dest.writeString(type);
+        dest.writeValue(price);
     }
 
     public static final class Price implements Parcelable {

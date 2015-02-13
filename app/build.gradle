@@ -45,4 +45,5 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'de.grundid.opendatalab:geojson-jackson:1.2'
     compile 'com.koushikdutta.ion:ion:2.0.5'
+    compile 'com.ToxicBakery.widget.calendarview:calendar-view:1.0.0'
 }

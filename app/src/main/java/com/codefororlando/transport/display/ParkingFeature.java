@@ -78,9 +78,8 @@ public class ParkingFeature implements IDisplayableFeature, IBroadcasts {
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (parkingItemMap.containsKey(marker)) {
-            final ParkingItem parkingItem = parkingItemMap.get(marker);
-
+        final ParkingItem parkingItem = parkingItemMap.get(marker);
+        if (parkingItem != null) {
             Intent intent = new Intent(ACTION_PARKING_MARKER_SELECTED);
             intent.putExtra(EXTRA_PARKING_ITEM, parkingItem);
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);

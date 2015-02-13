@@ -37,6 +37,10 @@ public class EventListings {
 
     }
 
+    public Venue getVenueById(int id) {
+        return venues.get(id);
+    }
+
     public Collection<Venue> getVenues() {
         return venues.values();
     }

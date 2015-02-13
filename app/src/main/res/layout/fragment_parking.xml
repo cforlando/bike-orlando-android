@@ -112,7 +112,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
-        android:background="@drawable/fab_button_orange"
+        android:background="@drawable/fab_button_blue"
         android:contentDescription="@string/fab_route_to_point"
         android:elevation="@dimen/elevation_high"
         android:src="@drawable/parkingpinpoint"
