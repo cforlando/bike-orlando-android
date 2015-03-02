@@ -1,6 +1,5 @@
 package com.codefororlando.transport.display;
 
-import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 
 import com.codefororlando.transport.controller.IMapController;
@@ -54,7 +53,7 @@ public interface IDisplayableFeature extends FeatureCollectionLoader.FeatureColl
     /**
      * Callback for a user clicking a map marker.
      *
-     * @return event was consumed by the feature implementation and no other implementations should
+     * @return true if event was consumed by the feature implementation and no other implementations should
      * be notified of the click.
      */
     public boolean onMarkerClick(Marker marker);

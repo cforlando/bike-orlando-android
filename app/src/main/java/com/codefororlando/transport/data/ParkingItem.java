@@ -1,8 +1,14 @@
 package com.codefororlando.transport.data;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.bitmap.BitmapUtility;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.geojson.Feature;
@@ -11,7 +17,7 @@ import org.geojson.Point;
 
 import java.util.LinkedHashMap;
 
-public class ParkingItem implements Parcelable {
+public class ParkingItem implements IClusterableParcelableItem {
 
     public static final Creator<ParkingItem> CREATOR = new Creator<ParkingItem>() {
         @Override
@@ -28,7 +34,7 @@ public class ParkingItem implements Parcelable {
     private static final String PROP_ADDRESS = "address";
     private static final String PROP_PRICE = "price";
     private static final String PROP_TYPE = "type";
-
+    private static BitmapDescriptor bitmapDescriptor;
     private final LatLng position;
     private final String address;
     private final String type;
@@ -67,6 +73,16 @@ public class ParkingItem implements Parcelable {
 
     public Price getPrice() {
         return price;
+    }
+
+    @Override
+    public BitmapDescriptor getMarkerIcon(Context context) {
+        if (bitmapDescriptor == null) {
+            final Bitmap bitmap = BitmapUtility.createBitmapWithCircleAndOverlay(context, R.color.colorPrimaryDarkBlue, R.drawable.parkingpinpoint, 32);
+            bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
+        }
+
+        return bitmapDescriptor;
     }
 
     @Override

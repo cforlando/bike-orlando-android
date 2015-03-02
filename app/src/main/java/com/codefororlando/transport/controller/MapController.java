@@ -35,7 +35,7 @@ import java.util.Arrays;
  *
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
-public final class BikeMapController implements IMapController, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraChangeListener {
+public final class MapController implements IMapController, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraChangeListener {
 
     private static final Class[] DISPLAYABLE_FEATURE_CLASSES = new Class[]{
             BikePathsFeature.class
@@ -48,11 +48,13 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
     private final Context context;
     private final GoogleMap map;
     private final SharedPreferences sharedPreferences;
+    private final ClusterManager clusterManager;
 
-    public BikeMapController(Context context, GoogleMap map) {
+    public MapController(Context context, GoogleMap map) {
         this.map = map;
         this.context = context;
         featureDescriptors = new FeatureDescriptor[DISPLAYABLE_FEATURE_CLASSES.length];
+        clusterManager = new ClusterManager(context, map);
 
         map.setOnMarkerClickListener(this);
         map.setOnCameraChangeListener(this);
@@ -122,6 +124,10 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
     }
 
     public void destroy() {
+        // Remove item references
+        clusterManager.clearItems();
+
+        // Notify features that the view is being destroyed
         for (FeatureDescriptor featureDescriptor : featureDescriptors) {
             featureDescriptor.getDisplayableFeature().destroy();
         }
@@ -129,6 +135,10 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        // Notify the clusters of a marker click
+        clusterManager.onMarkerClick(marker);
+
+        // Notify the features of a marker click
         for (FeatureDescriptor featureDescriptor : featureDescriptors) {
             if (featureDescriptor.getDisplayableFeature().onMarkerClick(marker))
                 return true;
@@ -139,9 +149,19 @@ public final class BikeMapController implements IMapController, GoogleMap.OnMark
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
+        // Notify the clusters of camera change
+        clusterManager.onCameraChange(cameraPosition);
+
+        // Notify features of camera changes
         for (FeatureDescriptor featureDescriptor : featureDescriptors) {
             featureDescriptor.getDisplayableFeature().onCameraChange(cameraPosition);
         }
+    }
+
+    @NonNull
+    @Override
+    public ClusterManager getClusterManager() {
+        return clusterManager;
     }
 
 }

@@ -2,42 +2,39 @@ package com.codefororlando.transport.display;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.RawRes;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.codefororlando.transport.IBroadcasts;
 import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.bitmap.BitmapUtility;
+import com.codefororlando.transport.controller.ClusterManager;
 import com.codefororlando.transport.controller.IMapController;
 import com.codefororlando.transport.data.EventItem;
 import com.codefororlando.transport.data.EventListings;
+import com.codefororlando.transport.data.IClusterableParcelableItem;
 import com.codefororlando.transport.loader.FeatureCollectionLoader;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 public class EventFeature implements IDisplayableFeature, EventListings.EventListingsListener, IBroadcasts {
 
-    private final Map<Marker, EventItem> eventItemMap;
-    private EventListings eventListings;
+    private final List<EventItem> eventItemList;
     private IMapController mapController;
+    private ClusterManager clusterManager;
     private GoogleMap map;
-    private boolean isShown;
+    private boolean isShown, isAdded;
 
     public EventFeature() {
-        eventItemMap = new HashMap<>();
+        eventItemList = new LinkedList<>();
     }
 
     @Override
@@ -53,9 +50,13 @@ public class EventFeature implements IDisplayableFeature, EventListings.EventLis
     @Override
     public void setController(IMapController mapController) {
         this.mapController = mapController;
+        clusterManager = mapController.getClusterManager();
         map = mapController.getMap();
 
+        // Pre load the events such that they are hopefully already loaded when/if the user decides to view them
         EventListings.load(this);
+
+        // Load the event locations
         FeatureCollectionLoader.load(this, R.raw.event_locations);
     }
 
@@ -77,18 +78,20 @@ public class EventFeature implements IDisplayableFeature, EventListings.EventLis
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        final EventItem eventItem = eventItemMap.get(marker);
-        if (eventItem != null) {
-            Intent intent = new Intent(ACTION_EVENT_MARKER_SELECTED);
+        final IClusterableParcelableItem clusterItem = clusterManager.getClusterItem(marker);
+        final int idx = eventItemList.indexOf(clusterItem);
+
+        // Find the bike rack item and retrieve it to prevent casting and instanceof checking. Effectively this is uncessary but more 'right'.
+        if (idx > -1) {
+            final EventItem eventItem = eventItemList.get(idx);
+            final Intent intent = new Intent(ACTION_EVENT_MARKER_SELECTED);
             intent.putExtra(EXTRA_EVENT_ITEM, eventItem);
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
 
-            // Animate to the location manually as true is returned by the click to prevent the info window popup
             map.animateCamera(CameraUpdateFactory.newLatLng(eventItem.getPosition()));
-
-            // Return true to disable the info window popup. This inadvertently also disables animation to the position
             return true;
         }
+
         return false;
     }
 
@@ -106,15 +109,8 @@ public class EventFeature implements IDisplayableFeature, EventListings.EventLis
     public void onFeatureCollectionLoaded(@RawRes int resourceId, FeatureCollection featureCollection) {
         switch (resourceId) {
             case R.raw.event_locations:
-                final Bitmap bitmap = BitmapUtility.createBitmapWithCircleAndOverlay(getContext(), R.color.colorPrimaryPurple, R.drawable.eventpintpoint, 32);
-                final BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-
                 for (Feature feature : featureCollection) {
-                    final EventItem eventItem = new EventItem(feature);
-                    final Marker marker = map.addMarker(new MarkerOptions().position(eventItem.getPosition())
-                            .icon(bitmapDescriptor)
-                            .visible(isShown));
-                    eventItemMap.put(marker, eventItem);
+                    eventItemList.add(new EventItem(feature));
                 }
                 updateVisibility();
                 break;
@@ -123,7 +119,6 @@ public class EventFeature implements IDisplayableFeature, EventListings.EventLis
 
     @Override
     public void onEventListingsLoaded(@NonNull EventListings eventListings) {
-        this.eventListings = eventListings;
     }
 
     @Override
@@ -132,9 +127,21 @@ public class EventFeature implements IDisplayableFeature, EventListings.EventLis
     }
 
     private void updateVisibility() {
-        for (Marker marker : eventItemMap.keySet()) {
-            marker.setVisible(isShown);
+        // Nothing to do if the items have not yet loaded
+        if (eventItemList.isEmpty()) {
+            return;
         }
+
+        if (isShown) {
+            clusterManager.addItems(new LinkedList<IClusterableParcelableItem>(eventItemList));
+            isAdded = true;
+        } else if (isAdded) {
+            clusterManager.removeItems(eventItemList);
+            isAdded = false;
+        }
+
+        // Recluster the points
+        clusterManager.cluster();
     }
 
 }

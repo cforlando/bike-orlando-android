@@ -1,15 +1,20 @@
 package com.codefororlando.transport.data;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Parcel;
-import android.os.Parcelable;
 
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.bitmap.BitmapUtility;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.geojson.Feature;
 import org.geojson.LngLatAlt;
 import org.geojson.Point;
 
-public class EventItem implements Parcelable {
+public class EventItem implements IClusterableParcelableItem {
 
     public static final Creator<EventItem> CREATOR = new Creator<EventItem>() {
         @Override
@@ -26,7 +31,7 @@ public class EventItem implements Parcelable {
     private static final String PROP_NAME = "name";
     private static final String PROP_VENUE_ID = "venueId";
     private static final String PROP_ADDRESS = "address";
-
+    private static BitmapDescriptor bitmapDescriptor;
     private final LatLng position;
     private final String name;
     private final int venueId;
@@ -47,6 +52,16 @@ public class EventItem implements Parcelable {
         venueId = parcel.readInt();
         name = parcel.readString();
         address = parcel.readString();
+    }
+
+    @Override
+    public synchronized BitmapDescriptor getMarkerIcon(Context context) {
+        if (bitmapDescriptor == null) {
+            final Bitmap bitmap = BitmapUtility.createBitmapWithCircleAndOverlay(context, R.color.colorPrimaryPurple, R.drawable.eventpintpoint, 32);
+            bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
+        }
+
+        return bitmapDescriptor;
     }
 
     public LatLng getPosition() {

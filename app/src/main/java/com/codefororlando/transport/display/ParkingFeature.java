@@ -2,40 +2,38 @@ package com.codefororlando.transport.display;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.RawRes;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.codefororlando.transport.IBroadcasts;
 import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.bitmap.BitmapUtility;
+import com.codefororlando.transport.controller.ClusterManager;
 import com.codefororlando.transport.controller.IMapController;
+import com.codefororlando.transport.data.IClusterableParcelableItem;
 import com.codefororlando.transport.data.ParkingItem;
 import com.codefororlando.transport.loader.FeatureCollectionLoader;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ParkingFeature implements IDisplayableFeature, IBroadcasts {
 
-    private final Map<Marker, ParkingItem> parkingItemMap;
+    private final List<ParkingItem> parkingItemList;
     private IMapController mapController;
+    private ClusterManager clusterManager;
     private GoogleMap map;
-    private boolean isShown;
+    private boolean isShown, isAdded;
 
     public ParkingFeature() {
-        parkingItemMap = new HashMap<>();
+        parkingItemList = new LinkedList<>();
     }
 
     @Override
@@ -51,6 +49,7 @@ public class ParkingFeature implements IDisplayableFeature, IBroadcasts {
     @Override
     public void setController(IMapController mapController) {
         this.mapController = mapController;
+        clusterManager = mapController.getClusterManager();
         map = mapController.getMap();
 
         FeatureCollectionLoader.load(this, R.raw.parking_combined_min);
@@ -70,26 +69,24 @@ public class ParkingFeature implements IDisplayableFeature, IBroadcasts {
 
     @Override
     public void destroy() {
-        for (Marker marker : parkingItemMap.keySet()) {
-            marker.remove();
-        }
-        parkingItemMap.clear();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        final ParkingItem parkingItem = parkingItemMap.get(marker);
-        if (parkingItem != null) {
-            Intent intent = new Intent(ACTION_PARKING_MARKER_SELECTED);
+        final IClusterableParcelableItem clusterItem = clusterManager.getClusterItem(marker);
+        final int idx = parkingItemList.indexOf(clusterItem);
+
+        // Find the bike rack item and retrieve it to prevent casting and instanceof checking. Effectively this is uncessary but more 'right'.
+        if (idx > -1) {
+            final ParkingItem parkingItem = parkingItemList.get(idx);
+            final Intent intent = new Intent(ACTION_PARKING_MARKER_SELECTED);
             intent.putExtra(EXTRA_PARKING_ITEM, parkingItem);
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
 
-            // Animate to the location manually as true is returned by the click to prevent the info window popup
             map.animateCamera(CameraUpdateFactory.newLatLng(parkingItem.getPosition()));
-
-            // Return true to disable the info window popup. This inadvertently also disables animation to the position
             return true;
         }
+
         return false;
     }
 
@@ -107,15 +104,8 @@ public class ParkingFeature implements IDisplayableFeature, IBroadcasts {
     public void onFeatureCollectionLoaded(@RawRes int resourceId, FeatureCollection featureCollection) {
         switch (resourceId) {
             case R.raw.parking_combined_min:
-                final Bitmap bitmap = BitmapUtility.createBitmapWithCircleAndOverlay(getContext(), R.color.colorPrimaryDarkBlue, R.drawable.parkingpinpoint, 32);
-                final BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-
                 for (Feature feature : featureCollection) {
-                    final ParkingItem parkingItem = new ParkingItem(feature);
-                    final Marker marker = map.addMarker(new MarkerOptions().position(parkingItem.getPosition())
-                            .icon(bitmapDescriptor)
-                            .visible(isShown));
-                    parkingItemMap.put(marker, parkingItem);
+                    parkingItemList.add(new ParkingItem(feature));
                 }
                 updateVisibility();
                 break;
@@ -123,9 +113,21 @@ public class ParkingFeature implements IDisplayableFeature, IBroadcasts {
     }
 
     private void updateVisibility() {
-        for (Marker marker : parkingItemMap.keySet()) {
-            marker.setVisible(isShown);
+        // Nothing to do if the items have not yet loaded
+        if (parkingItemList.isEmpty()) {
+            return;
         }
+
+        if (isShown) {
+            clusterManager.addItems(new LinkedList<IClusterableParcelableItem>(parkingItemList));
+            isAdded = true;
+        } else if (isAdded) {
+            clusterManager.removeItems(parkingItemList);
+            isAdded = false;
+        }
+
+        // Recluster the points
+        clusterManager.cluster();
     }
 
 }
