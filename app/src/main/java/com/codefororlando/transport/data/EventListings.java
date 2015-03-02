@@ -14,7 +14,10 @@ import java.util.Map;
 
 public class EventListings {
 
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedDeclaration"})
     private Map<Integer, Venue> venues;
+
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "UnusedDeclaration"})
     private Map<Integer, Event[]> events;
 
     public static synchronized void load(final EventListingsListener eventListingsListener) {

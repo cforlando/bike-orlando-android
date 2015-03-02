@@ -103,7 +103,7 @@ public class FilterView extends RelativeLayout implements View.OnClickListener {
             @Override
             public void onFeatureToggled(FeatureDescriptor featureDescriptor) {
 
-                // Disable any enabled features not in the group
+/*                // Disable any enabled features not in the group
                 final int groupId = featureDescriptor.getGroupId();
                 for (int i = 0, j = adapter.getFeatureDescriptorCount(); i < j; ++i) {
                     final FeatureDescriptor descriptor = adapter.getFeatureDescriptor(i);
@@ -111,7 +111,7 @@ public class FilterView extends RelativeLayout implements View.OnClickListener {
                         mapController.toggleFeature(descriptor);
                     }
                 }
-                adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();*/
 
                 // Enable the selected feature
                 mapController.toggleFeature(featureDescriptor);

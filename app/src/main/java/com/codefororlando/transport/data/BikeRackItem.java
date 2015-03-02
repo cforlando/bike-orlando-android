@@ -1,16 +1,17 @@
 package com.codefororlando.transport.data;
 
+import android.content.Context;
 import android.os.Parcel;
-import android.os.Parcelable;
 
+import com.codefororlando.transport.bikeorlando.R;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
 
 import org.geojson.Feature;
 import org.geojson.LngLatAlt;
 import org.geojson.Point;
 
-public final class BikeRackItem implements ClusterItem, Parcelable {
+public final class BikeRackItem implements IClusterableParcelableItem {
 
     public static final Creator<BikeRackItem> CREATOR = new Creator<BikeRackItem>() {
         @Override
@@ -60,6 +61,11 @@ public final class BikeRackItem implements ClusterItem, Parcelable {
     }
 
     @Override
+    public BitmapDescriptor getMarkerIcon(Context context) {
+        return MarkerIcon.getMarkerIcon(R.drawable.bikerackpinpoint);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -75,9 +81,9 @@ public final class BikeRackItem implements ClusterItem, Parcelable {
     }
 
     /**
-     * Returns the underlying LatLng position. It is imperative that the LatLng be cloned should changes need to be made
-     * as the object being immutable is a dependency of {@link com.codefororlando.transport.controller
-     * .BikeRackClusterManager}.
+     * Returns the underlying LatLng position. It is imperative that the LatLng be cloned should
+     * changes need to be made as the object being immutable is a dependency of {@link
+     * com.codefororlando.transport.controller .BikeRackClusterManager}.
      *
      * @return World Geodetic coordinate of the bike rack
      */

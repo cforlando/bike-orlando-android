@@ -40,4 +40,14 @@ public interface IMapController {
     public
     @NonNull
     FeatureDescriptor[] getFeatureDescriptors();
+
+    /**
+     * The cluster manager on the map.
+     *
+     * @return cluster manager
+     */
+    public
+    @NonNull
+    ClusterManager getClusterManager();
+
 }
