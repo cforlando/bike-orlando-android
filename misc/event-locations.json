@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.384028,
+          28.53968
+        ]
+      },
+      "properties": {
+        "venueId": 8513,
+        "name": "Amway Center",
+        "address": "400 West Church Street #200\nOrlando, FL 32801"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.377361,
+          28.537662
+        ]
+      },
+      "properties": {
+        "venueId": 11807,
+        "name": "Dr. Phillips Center",
+        "address": "445 South Magnolia Avenue\nOrlando, FL 32801"
+      }
+    }
+  ]
+}

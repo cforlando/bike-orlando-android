@@ -10,7 +10,8 @@ import com.codefororlando.transport.IBroadcasts;
 import com.codefororlando.transport.bikeorlando.R;
 import com.codefororlando.transport.controller.ClusterManager;
 import com.codefororlando.transport.controller.IMapController;
-import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.data.EventItem;
+import com.codefororlando.transport.data.EventListings;
 import com.codefororlando.transport.data.IClusterableParcelableItem;
 import com.codefororlando.transport.loader.FeatureCollectionLoader;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,26 +25,26 @@ import org.geojson.FeatureCollection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BikeRacksFeature implements IDisplayableFeature, IBroadcasts {
+public class EventFeature implements IDisplayableFeature, EventListings.EventListingsListener, IBroadcasts {
 
-    private final List<BikeRackItem> bikeRackItems;
+    private final List<EventItem> eventItemList;
     private IMapController mapController;
     private ClusterManager clusterManager;
     private GoogleMap map;
     private boolean isShown, isAdded;
 
-    public BikeRacksFeature() {
-        bikeRackItems = new LinkedList<>();
+    public EventFeature() {
+        eventItemList = new LinkedList<>();
     }
 
     @Override
     public int getGroupId() {
-        return R.string.group_biking;
+        return R.string.group_events;
     }
 
     @Override
     public int getFeatureName() {
-        return R.string.display_feature_racks;
+        return R.string.display_feature_events_ticketed;
     }
 
     @Override
@@ -52,7 +53,11 @@ public class BikeRacksFeature implements IDisplayableFeature, IBroadcasts {
         clusterManager = mapController.getClusterManager();
         map = mapController.getMap();
 
-        FeatureCollectionLoader.load(this, R.raw.bike_parking);
+        // Pre load the events such that they are hopefully already loaded when/if the user decides to view them
+        EventListings.load(this);
+
+        // Load the event locations
+        FeatureCollectionLoader.load(this, R.raw.event_locations);
     }
 
     @Override
@@ -74,16 +79,16 @@ public class BikeRacksFeature implements IDisplayableFeature, IBroadcasts {
     @Override
     public boolean onMarkerClick(Marker marker) {
         final IClusterableParcelableItem clusterItem = clusterManager.getClusterItem(marker);
-        final int idx = bikeRackItems.indexOf(clusterItem);
+        final int idx = eventItemList.indexOf(clusterItem);
 
         // Find the bike rack item and retrieve it to prevent casting and instanceof checking. Effectively this is uncessary but more 'right'.
         if (idx > -1) {
-            final BikeRackItem bikeRackItem = bikeRackItems.get(idx);
-            final Intent intent = new Intent(ACTION_BIKE_MARKER_SELECTED);
-            intent.putExtra(EXTRA_BIKE_RACK_ITEM, bikeRackItem);
+            final EventItem eventItem = eventItemList.get(idx);
+            final Intent intent = new Intent(ACTION_EVENT_MARKER_SELECTED);
+            intent.putExtra(EXTRA_EVENT_ITEM, eventItem);
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
 
-            map.animateCamera(CameraUpdateFactory.newLatLng(bikeRackItem.getPosition()));
+            map.animateCamera(CameraUpdateFactory.newLatLng(eventItem.getPosition()));
             return true;
         }
 
@@ -103,27 +108,35 @@ public class BikeRacksFeature implements IDisplayableFeature, IBroadcasts {
     @Override
     public void onFeatureCollectionLoaded(@RawRes int resourceId, FeatureCollection featureCollection) {
         switch (resourceId) {
-            case R.raw.bike_parking:
+            case R.raw.event_locations:
                 for (Feature feature : featureCollection) {
-                    bikeRackItems.add(new BikeRackItem(feature));
+                    eventItemList.add(new EventItem(feature));
                 }
                 updateVisibility();
                 break;
         }
     }
 
-    // FIXME This can probably be done as a static helper otherwise most if not all implementations will do the same thing
+    @Override
+    public void onEventListingsLoaded(@NonNull EventListings eventListings) {
+    }
+
+    @Override
+    public void onEventListingsError(Exception e) {
+        e.printStackTrace();
+    }
+
     private void updateVisibility() {
         // Nothing to do if the items have not yet loaded
-        if (bikeRackItems.isEmpty()) {
+        if (eventItemList.isEmpty()) {
             return;
         }
 
         if (isShown) {
-            clusterManager.addItems(new LinkedList<IClusterableParcelableItem>(bikeRackItems));
+            clusterManager.addItems(new LinkedList<IClusterableParcelableItem>(eventItemList));
             isAdded = true;
         } else if (isAdded) {
-            clusterManager.removeItems(bikeRackItems);
+            clusterManager.removeItems(eventItemList);
             isAdded = false;
         }
 

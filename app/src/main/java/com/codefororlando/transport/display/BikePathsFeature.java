@@ -28,6 +28,11 @@ public class BikePathsFeature implements IDisplayableFeature {
     private TileOverlay tileOverlay;
 
     @Override
+    public int getGroupId() {
+        return R.string.group_biking;
+    }
+
+    @Override
     public int getFeatureName() {
         return R.string.display_feature_bike_paths;
     }
@@ -37,7 +42,7 @@ public class BikePathsFeature implements IDisplayableFeature {
         this.mapController = mapController;
         map = mapController.getMap();
 
-        FeatureCollectionLoader.getInstance(this, R.raw.bike_lanes);
+        FeatureCollectionLoader.load(this, R.raw.bike_lanes);
     }
 
     @Override
@@ -63,11 +68,6 @@ public class BikePathsFeature implements IDisplayableFeature {
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-    }
-
-    @Override
-    public boolean displayAtLaunch() {
-        return true;
     }
 
     private void updateVisibility() {

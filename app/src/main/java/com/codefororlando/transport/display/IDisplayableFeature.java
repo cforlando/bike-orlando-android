@@ -10,6 +10,16 @@ import com.google.android.gms.maps.model.Marker;
 public interface IDisplayableFeature extends FeatureCollectionLoader.FeatureCollectionLoaderListener {
 
     /**
+     * The id of the group this feature belongs to. Multiple items from a group can be displayed at
+     * the same time but only one group may be on screen at any given time.
+     *
+     * @return resource id of the group
+     */
+    public
+    @StringRes
+    int getGroupId();
+
+    /**
      * The name of the feature represented by a String resource.
      *
      * @return string resource
@@ -43,7 +53,7 @@ public interface IDisplayableFeature extends FeatureCollectionLoader.FeatureColl
     /**
      * Callback for a user clicking a map marker.
      *
-     * @return event was consumed by the feature implementation and no other implementations should
+     * @return true if event was consumed by the feature implementation and no other implementations should
      * be notified of the click.
      */
     public boolean onMarkerClick(Marker marker);
@@ -54,12 +64,5 @@ public interface IDisplayableFeature extends FeatureCollectionLoader.FeatureColl
      * @param cameraPosition new camera position.
      */
     public void onCameraChange(CameraPosition cameraPosition);
-
-    /**
-     * Indicate if the feature should be turned on at the start of the application.
-     *
-     * @return true if should be shown at cold start
-     */
-    public boolean displayAtLaunch();
 
 }

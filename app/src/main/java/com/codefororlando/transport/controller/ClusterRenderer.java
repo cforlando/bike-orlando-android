@@ -1,39 +1,41 @@
 package com.codefororlando.transport.controller;
 
-import android.content.*;
-import android.content.res.*;
-import android.graphics.drawable.*;
-import android.graphics.drawable.shapes.*;
-import android.util.*;
-import android.view.*;
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
+import android.util.SparseArray;
+import android.view.ViewGroup;
 
-import com.codefororlando.transport.bikeorlando.*;
-import com.codefororlando.transport.data.*;
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
-import com.google.maps.android.clustering.*;
-import com.google.maps.android.clustering.view.*;
-import com.google.maps.android.ui.*;
+import com.codefororlando.transport.bikeorlando.R;
+import com.codefororlando.transport.data.IClusterableParcelableItem;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.google.maps.android.ui.IconGenerator;
+import com.google.maps.android.ui.SquareTextView;
 
-import java.util.HashMap;
-import java.util.Map;
-
-final class BikeRackClusterRenderer extends DefaultClusterRenderer<BikeRackItem> {
+final class ClusterRenderer extends DefaultClusterRenderer<IClusterableParcelableItem> {
 
     private static final int[] BUCKETS = {10, 20, 50, 100, 200, 500, 1000};
 
     private final int[] clusterColors;
     private final SparseArray<BitmapDescriptor> clusterBitmapDescriptors = new SparseArray<>();
-    private final Map<String, BikeRackItem> markerToBikeRackItemMap = new HashMap<>();
 
-    private final BitmapDescriptor markerBitmapDescriptor;
     private final IconGenerator iconGenerator;
     private final float density;
     private final ShapeDrawable clusterLayerBackground;
+    private final Context context;
 
-    public BikeRackClusterRenderer(Context context, GoogleMap map,
-                                   ClusterManager<BikeRackItem> clusterManager) {
+    public ClusterRenderer(Context context, GoogleMap map, ClusterManager clusterManager) {
         super(context, map, clusterManager);
+
+        this.context = context.getApplicationContext();
 
         TypedArray typedArray = context.getResources().obtainTypedArray(R.array.colorClusters);
         clusterColors = new int[typedArray.length()];
@@ -44,7 +46,6 @@ final class BikeRackClusterRenderer extends DefaultClusterRenderer<BikeRackItem>
 
         density = context.getResources().getDisplayMetrics().density;
         clusterLayerBackground = new ShapeDrawable(new OvalShape());
-        markerBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.bikerackpinpoint);
 
         iconGenerator = new IconGenerator(context);
         iconGenerator.setContentView(makeSquareTextView(context));
@@ -52,13 +53,20 @@ final class BikeRackClusterRenderer extends DefaultClusterRenderer<BikeRackItem>
         iconGenerator.setBackground(makeClusterBackground());
     }
 
-    @Override
-    protected void onBeforeClusterItemRendered(BikeRackItem item, MarkerOptions markerOptions) {
-        markerOptions.icon(markerBitmapDescriptor);
+    private Context getContext() {
+        return context;
     }
 
     @Override
-    protected void onBeforeClusterRendered(Cluster<BikeRackItem> cluster, MarkerOptions markerOptions) {
+    protected void onBeforeClusterItemRendered(IClusterableParcelableItem item, MarkerOptions markerOptions) {
+        BitmapDescriptor icon = item.getMarkerIcon(getContext());
+        if (icon != null) {
+            markerOptions.icon(icon);
+        }
+    }
+
+    @Override
+    protected void onBeforeClusterRendered(Cluster<IClusterableParcelableItem> cluster, MarkerOptions markerOptions) {
         int bucket = getBucket(cluster);
         BitmapDescriptor descriptor = clusterBitmapDescriptors.get(bucket);
         if (descriptor == null) {
@@ -68,15 +76,6 @@ final class BikeRackClusterRenderer extends DefaultClusterRenderer<BikeRackItem>
         }
 
         markerOptions.icon(descriptor);
-    }
-
-    @Override
-    protected void onClusterItemRendered(final BikeRackItem clusterItem, final Marker marker) {
-        markerToBikeRackItemMap.put(marker.getId(), clusterItem);
-    }
-
-    public BikeRackItem getItemForMarker(Marker marker) {
-        return markerToBikeRackItemMap.get(marker.getId());
     }
 
     private LayerDrawable makeClusterBackground() {

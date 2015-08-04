@@ -11,4 +11,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.TextAppearance" parent="TextAppearance.AppCompat">
+    </style>
+
+    <style name="AppTheme.TextAppearance.Title" parent="TextAppearance.AppCompat.Title">
+    </style>
+
 </resources>

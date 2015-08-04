@@ -2,11 +2,13 @@
 <resources>
 
     <!-- THEME -->
-    <color name="colorPrimary">#ffff9800</color>
-    <color name="colorPrimaryDark">#ffe65100</color>
+    <color name="colorPrimary">#ffffd26c</color>
+    <color name="colorPrimaryDark">#fff7b334</color>
     <color name="colorPrimaryDarkBlue">#ff01579B</color>
+    <color name="colorPrimaryPurple">#ff7d43ab</color>
     <color name="colorAccent">#ff6d00</color>
     <color name="colorAccentBlue">#ff0091ea</color>
+    <color name="colorAccentPurple">#ff9e5cd1</color>
     <color name="colorTextPrimary">#ffffffff</color>
     <color name="colorTextPrimaryInverse">#ff000000</color>
     <!-- MAP -->
@@ -24,5 +26,7 @@
     <color name="fab_border">#77424242</color>
     <!-- Feature Filter -->
     <color name="feature_filter_bg">#bbffffff</color>
+    <color name="feature_filter_group_bg">#bbcccccc</color>
+
 
 </resources>

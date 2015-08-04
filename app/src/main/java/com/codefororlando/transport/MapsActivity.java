@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -27,8 +28,12 @@ import android.view.animation.TranslateAnimation;
 
 import com.codefororlando.transport.animation.EmptyAnimationListener;
 import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.controller.BikeMapController;
+import com.codefororlando.transport.controller.MapController;
 import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.data.EventItem;
+import com.codefororlando.transport.data.ParkingItem;
+import com.codefororlando.transport.fragment.FragmentEvent;
+import com.codefororlando.transport.fragment.FragmentParking;
 import com.codefororlando.transport.fragment.FragmentRack;
 import com.codefororlando.transport.fragment.ISelectableItemFragment;
 import com.codefororlando.transport.view.FilterView;
@@ -40,40 +45,11 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * @author Ian Thomas <toxicbakery@gmail.com>
  */
-@SuppressWarnings("WeakerAccess")
-public class MapsActivity extends Activity implements GoogleMap.OnMapClickListener {
+public class MapsActivity extends Activity implements GoogleMap.OnMapClickListener, IBroadcasts {
 
-    /**
-     * Bike item marker selected.
-     * <p/>
-     * Always includes {@link #EXTRA_BIKE_RACK_ITEM}.
-     */
-    public static final String ACTION_BIKE_MARKER_SELECTED = "ACTION_BIKE_MARKER_SELECTED";
+    private final BroadcastReceiver broadcastReceiver = new SelectableItemReceiver();
 
-    /**
-     * {@link com.codefororlando.transport.data.BikeRackItem} instance.
-     */
-    public static final String EXTRA_BIKE_RACK_ITEM = "EXTRA_BIKE_RACK_ITEM";
-
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case ACTION_BIKE_MARKER_SELECTED: {
-                    final BikeRackItem bikeRackItem = intent.getParcelableExtra(EXTRA_BIKE_RACK_ITEM);
-                    Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
-                    if (fragment == null) {
-                        fragment = FragmentRack.newInstance(bikeRackItem);
-                        showSelectableItemFragment(fragment);
-                    } else {
-                        ((FragmentRack) fragment).setBikeRackItem(bikeRackItem);
-                    }
-                }
-            }
-        }
-    };
-    private static final int ZOOM_CITY = 11;
-    private BikeMapController mapController;
+    private MapController mapController;
     private GoogleMap map;
     private FilterView filterView;
 
@@ -92,8 +68,12 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         super.onResume();
         setUpMapIfNeeded(null);
 
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver,
-                new IntentFilter(ACTION_BIKE_MARKER_SELECTED));
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_BIKE_MARKER_SELECTED);
+        intentFilter.addAction(ACTION_PARKING_MARKER_SELECTED);
+        intentFilter.addAction(ACTION_EVENT_MARKER_SELECTED);
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver, intentFilter);
 
         // FIXME Filter should save state to prevent ghost touch of recyclerview
         filterView.animateOnScreen(true);
@@ -121,8 +101,13 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
     public void onBackPressed() {
         Fragment fragment = getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
         if (filterView.isExpanded()) {
+            // Close the FilterView if it is open
             filterView.animateOpen(false);
         } else if (fragment != null && !fragment.isHidden()) {
+            // Display the filter fab
+            filterView.animateOnScreen(true);
+
+            // Remove the on screen fragment
             removeSelectableItemFragment();
         } else {
             super.onBackPressed();
@@ -174,14 +159,13 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         }
 
         if (map != null && mapController == null) {
-            mapController = new BikeMapController(this, map);
+            mapController = new MapController(this, map);
 
             if (savedInstanceState == null) {
-                // Look at Orlando from state level
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
-                // Animate zoom to city level
-                map.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_CITY));
+                // Animate zoom to city level and move to Orlando
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(28.5383355d, -81.3792365d), 11));
             }
         }
 
@@ -208,6 +192,71 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
                 .setCustomAnimations(R.anim.slide_up, 0)
                 .replace(R.id.details_fragment_container, removableFragment, ISelectableItemFragment.TAG)
                 .commit();
+
+    }
+
+    private final class SelectableItemReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ACTION_BIKE_MARKER_SELECTED: {
+                    final BikeRackItem bikeRackItem = intent.getParcelableExtra(EXTRA_BIKE_RACK_ITEM);
+                    if (removeWrongFragment(FragmentRack.class)) {
+                        showSelectableItemFragment(FragmentRack.newInstance(bikeRackItem));
+                    } else {
+                        ((FragmentRack) getSelectableItemFragment()).setBikeRackItem(bikeRackItem);
+                    }
+                    break;
+                }
+                case ACTION_PARKING_MARKER_SELECTED: {
+                    final ParkingItem parkingItem = intent.getParcelableExtra(EXTRA_PARKING_ITEM);
+                    if (removeWrongFragment(FragmentParking.class)) {
+                        showSelectableItemFragment(FragmentParking.newInstance(parkingItem));
+                    } else {
+                        ((FragmentParking) getSelectableItemFragment()).setParkingItem(parkingItem);
+                    }
+                    break;
+                }
+                case ACTION_EVENT_MARKER_SELECTED: {
+                    final EventItem eventItem = intent.getParcelableExtra(EXTRA_EVENT_ITEM);
+                    if (removeWrongFragment(FragmentEvent.class)) {
+                        showSelectableItemFragment(FragmentEvent.newInstance(eventItem));
+                    } else {
+                        ((FragmentEvent) getSelectableItemFragment()).setEventItem(eventItem);
+                    }
+                    break;
+                }
+            }
+        }
+
+        /**
+         * Remove the incorrectly displayed fragment determined by the expected fragment type.
+         *
+         * @param fragmentClass the class of the fragment that needs to be displayed. Fragments found of other types will be removed.
+         * @return true if the fragment was removed or if non existed
+         */
+        private boolean removeWrongFragment(Class<? extends Fragment> fragmentClass) {
+            final Fragment fragment = getSelectableItemFragment();
+            if (fragment == null) {
+                return true;
+            } else if (!fragment.getClass().equals(fragmentClass)) {
+                getFragmentManager().beginTransaction()
+                        .remove(fragment)
+                        .commit();
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Get the current selectable item fragment instance if one exists.
+         *
+         * @return the selectable fragment instance or null
+         */
+        private Fragment getSelectableItemFragment() {
+            return getFragmentManager().findFragmentByTag(ISelectableItemFragment.TAG);
+        }
 
     }
 

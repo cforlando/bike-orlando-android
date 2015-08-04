@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="default_selected_group" type="string">@string/group_biking</item>
+
+</resources>

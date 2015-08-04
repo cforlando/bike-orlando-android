@@ -13,35 +13,34 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codefororlando.transport.MapsActivity;
+import com.codefororlando.transport.EventListActivity;
+import com.codefororlando.transport.IBroadcasts;
 import com.codefororlando.transport.animation.EmptyAnimatorListener;
 import com.codefororlando.transport.bikeorlando.R;
-import com.codefororlando.transport.data.BikeRackItem;
+import com.codefororlando.transport.data.EventItem;
 
-public class FragmentRack extends Fragment implements View.OnClickListener, ISelectableItemFragment {
+public class FragmentEvent extends Fragment implements View.OnClickListener, ISelectableItemFragment, IBroadcasts {
 
-    private TextView textViewRackAddress;
-    private TextView textViewRackOwnership;
-    private TextView textViewRackType;
-    private TextView textViewRackCapacity;
+    private TextView textViewEventName;
+    private TextView textViewEventAddress;
 
-    private BikeRackItem bikeRackItem;
+    private EventItem eventItem;
 
-    public static Fragment newInstance(BikeRackItem bikeRackItem) {
+    public static Fragment newInstance(EventItem eventItem) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(MapsActivity.EXTRA_BIKE_RACK_ITEM, bikeRackItem);
+        bundle.putParcelable(EXTRA_EVENT_ITEM, eventItem);
 
-        Fragment fragment = new FragmentRack();
+        Fragment fragment = new FragmentEvent();
         fragment.setArguments(bundle);
 
         return fragment;
     }
 
     @Override
-    public void onClick(final View v) {
+    public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab_route_to_point:
-                final Uri geoLocation = Uri.parse("geo:0,0?q=" + bikeRackItem.getAddress());
+            case R.id.fab_route_to_point: {
+                final Uri geoLocation = Uri.parse("geo:0,0?q=" + eventItem.getName() + ", " + eventItem.getAddress());
                 final Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(geoLocation);
                 if (intent.resolveActivity(getActivity().getPackageManager()) == null) {
@@ -51,20 +50,26 @@ public class FragmentRack extends Fragment implements View.OnClickListener, ISel
                     startActivity(intent);
                 }
                 break;
+            }
+            case R.id.event_button_list: {
+                final Intent intent = new Intent(getActivity(), EventListActivity.class);
+                intent.putExtra(EXTRA_EVENT_ITEM, eventItem);
+                startActivity(intent);
+                break;
+            }
         }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_rack, container, false);
+        final View view = inflater.inflate(R.layout.fragment_event, container, false);
 
-        textViewRackAddress = (TextView) view.findViewById(R.id.rack_text_view_address);
-        textViewRackOwnership = (TextView) view.findViewById(R.id.rack_text_view_ownership);
-        textViewRackType = (TextView) view.findViewById(R.id.rack_text_view_type);
-        textViewRackCapacity = (TextView) view.findViewById(R.id.rack_text_view_capacity);
+        textViewEventName = (TextView) view.findViewById(R.id.event_text_view_name);
+        textViewEventAddress = (TextView) view.findViewById(R.id.event_text_view_address);
+        view.findViewById(R.id.event_button_list).setOnClickListener(this);
 
-        setBikeRackItem(getArguments().<BikeRackItem>getParcelable(MapsActivity.EXTRA_BIKE_RACK_ITEM));
+        setEventItem(getArguments().<EventItem>getParcelable(EXTRA_EVENT_ITEM));
 
         final View fabRouteToPoint = view.findViewById(R.id.fab_route_to_point);
         fabRouteToPoint.setOnClickListener(this);
@@ -85,21 +90,14 @@ public class FragmentRack extends Fragment implements View.OnClickListener, ISel
         return view;
     }
 
-    public void setBikeRackItem(BikeRackItem bikeRackItem) {
-        this.bikeRackItem = bikeRackItem;
-        updateRack();
+    public void setEventItem(EventItem eventItem) {
+        this.eventItem = eventItem;
+        updateEvent();
     }
 
-    private void updateRack() {
-        final String ownership = getString(R.string.rack_ownership).replace("?", bikeRackItem.getOwnership());
-        final String type = getString(R.string.rack_type).replace("?", bikeRackItem.getType());
-        final String capacity = getString(R.string.rack_capacity).replace("?",
-                Integer.toString(bikeRackItem.getCapacity()));
-
-        textViewRackAddress.setText(bikeRackItem.getAddress());
-        textViewRackOwnership.setText(ownership);
-        textViewRackType.setText(type);
-        textViewRackCapacity.setText(capacity);
+    private void updateEvent() {
+        textViewEventName.setText(eventItem.getName());
+        textViewEventAddress.setText(eventItem.getAddress());
     }
 
 }
