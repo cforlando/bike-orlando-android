@@ -189,7 +189,7 @@ public class MapsActivity extends Activity implements GoogleMap.OnMapClickListen
         filterView.animateOnScreen(false);
 
         getFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_up, 0)
+                .setCustomAnimations(R.animator.slide_up, 0)
                 .replace(R.id.details_fragment_container, removableFragment, ISelectableItemFragment.TAG)
                 .commit();
 
