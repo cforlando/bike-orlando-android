@@ -1,15 +1,22 @@
 language: android
-jdk: oraclejdk7
+jdk: oraclejdk8
+
 before_install:
  - chmod +x gradlew
- - echo yes | android update sdk --all --filter build-tools-21.1.2 --no-ui --force > /dev/null
 
 env:
   matrix:
-    - ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
+    - ANDROID_TARGET=android-23  ANDROID_ABI=armeabi-v7a
 
 android:
   components:
-    - build-tools-21.0.2
+    - tools
+    - platform-tools
+    - build-tools-23.0.3
+    - android-23
+    - extra-android-support
+    - extra-android-m2repository
+    - extra-google-google_play_services
+    - extra-google-m2repository
 
 script: ./gradlew assembleDebug
